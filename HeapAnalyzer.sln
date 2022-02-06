@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32002.261
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeapAnalyzerTool", "HeapAnalyzerTool\HeapAnalyzerTool.vcxproj", "{E9E7148D-DBD5-4A79-812C-D513640677C6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848} = {A43B5716-7BFC-411D-A5EE-B2A510F90848}
+		{90D3AD32-7545-479C-A863-29EA4D95B613} = {90D3AD32-7545-479C-A863-29EA4D95B613}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeapAnalyzerLib", "HeapAnalyzerLib\HeapAnalyzerLib.vcxproj", "{A43B5716-7BFC-411D-A5EE-B2A510F90848}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HeapAnalyzerDll", "HeapAnalyzerDll\HeapAnalyzerDll.vcxproj", "{90D3AD32-7545-479C-A863-29EA4D95B613}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848} = {A43B5716-7BFC-411D-A5EE-B2A510F90848}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Debug|x64.ActiveCfg = Debug|x64
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Debug|x64.Build.0 = Debug|x64
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Debug|x86.ActiveCfg = Debug|Win32
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Debug|x86.Build.0 = Debug|Win32
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Release|x64.ActiveCfg = Release|x64
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Release|x64.Build.0 = Release|x64
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Release|x86.ActiveCfg = Release|Win32
+		{E9E7148D-DBD5-4A79-812C-D513640677C6}.Release|x86.Build.0 = Release|Win32
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Debug|x64.ActiveCfg = Debug|x64
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Debug|x64.Build.0 = Debug|x64
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Debug|x86.ActiveCfg = Debug|Win32
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Debug|x86.Build.0 = Debug|Win32
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Release|x64.ActiveCfg = Release|x64
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Release|x64.Build.0 = Release|x64
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Release|x86.ActiveCfg = Release|Win32
+		{A43B5716-7BFC-411D-A5EE-B2A510F90848}.Release|x86.Build.0 = Release|Win32
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Debug|x64.ActiveCfg = Debug|x64
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Debug|x64.Build.0 = Debug|x64
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Debug|x86.ActiveCfg = Debug|Win32
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Debug|x86.Build.0 = Debug|Win32
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Release|x64.ActiveCfg = Release|x64
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Release|x64.Build.0 = Release|x64
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Release|x86.ActiveCfg = Release|Win32
+		{90D3AD32-7545-479C-A863-29EA4D95B613}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {487FE8D0-3007-4AB2-9190-09C7E793104E}
+	EndGlobalSection
+EndGlobal
