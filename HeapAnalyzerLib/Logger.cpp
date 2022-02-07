@@ -131,14 +131,7 @@ void Logger::LogMessage(LogLevel lvl, const std::string& msg)
 
     auto currentTime = std::chrono::system_clock::now();
 
-    m_file << "["
-        << currentTime << "] ["
-        << LogLevelToString(lvl) << "] ["
-        << m_processName << "] ["
-        << m_moduleName << "] ["
-        << m_pid << " : " << getCurrentThreadId() << "] - "
-        << msg
-        << std::endl;
-
+    m_file << std::format("[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
+        currentTime, LogLevelToString(lvl), m_processName, m_moduleName, m_pid, getCurrentThreadId(), msg);
     m_file.flush();
 }
