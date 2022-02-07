@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Logger.h"
+#include "Settings.h"
 
 #include <exception>
 #include <limits>
@@ -51,7 +52,8 @@ struct WorkingHeapAllocator
 private:
     void report(T* p, std::size_t n, bool alloc = true) const
     {
-        if constexpr (bEnableReport == true)
+        extern Settings g_settings;
+        if (g_settings.bWorkingHeapAllocatorLogging == true)
         {
             extern Logger g_logger;
             g_logger.LogInfo("{} {} ({} * {}) bytes at {}",

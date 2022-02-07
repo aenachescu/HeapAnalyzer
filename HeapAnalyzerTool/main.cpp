@@ -1,3 +1,4 @@
+#include "Settings.h"
 #include "Logger.h"
 #include "Allocator.h"
 #include "WinapiHeap.h"
@@ -7,6 +8,7 @@
 #include <string>
 #include <iostream>
 
+Settings g_settings;
 Logger g_logger;
 HANDLE g_hWorkingHeap = NULL;
 
@@ -96,9 +98,11 @@ void AnalyzeHeapsForProcess(DWORD pid)
     std::string dllPath;
     void* dllPathRemote = NULL;
     HANDLE hThread = NULL;
-    HMODULE hKernel32 = NULL;
     HANDLE hProcess = NULL;
+    HANDLE hSharedMemory = NULL;
+    HMODULE hKernel32 = NULL;
     BOOL bRes = FALSE;
+    Settings* sharedSettings = NULL;
 
     do {
         if (GetModuleFileNameA(NULL, moduleFileName, sizeof(moduleFileName)) == 0)
@@ -123,6 +127,22 @@ void AnalyzeHeapsForProcess(DWORD pid)
 
             g_logger.LogInfo("dll path: [{}]", dllPath);
         }
+
+        hSharedMemory = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(Settings), Settings::kSharedMemoryName);
+        if (hSharedMemory == NULL)
+        {
+            g_logger.LogError("failed to create shared memory: {}", GetLastError());
+            break;
+        }
+
+        sharedSettings = (Settings*)MapViewOfFile(hSharedMemory, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Settings));
+        if (sharedSettings == NULL)
+        {
+            g_logger.LogError("failed to map settings: {}", GetLastError());
+            break;
+        }
+
+        memcpy(sharedSettings, &g_settings, sizeof(Settings));
 
         hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
         if (hProcess == NULL)
@@ -173,6 +193,12 @@ void AnalyzeHeapsForProcess(DWORD pid)
 
     if (hProcess != NULL)
         CloseHandle(hProcess);
+
+    if (sharedSettings != NULL)
+        UnmapViewOfFile(sharedSettings);
+
+    if (hSharedMemory != NULL)
+        CloseHandle(hSharedMemory);
 }
 
 void DllInjectorTest()
@@ -183,6 +209,29 @@ void DllInjectorTest()
     std::cin >> s;
 }
 
+void ParseSettings(int argc, const char** argv, int start)
+{
+    for (int i = start; i < argc; i++)
+    {
+        if (strcmp("WorkingHeapAllocatorLogging", argv[i]) == 0)
+        {
+            g_settings.bWorkingHeapAllocatorLogging = true;
+        }
+        else if (strcmp("StatsPerRegionLogging", argv[i]) == 0)
+        {
+            g_settings.bStatsPerRegionLogging = true;
+        }
+        else if (strcmp("HeapEntryLogging", argv[i]) == 0)
+        {
+            g_settings.bHeapEntryLogging = true;
+        }
+        else
+        {
+            g_logger.LogError("unknown setting: [{}]", argv[i]);
+        }
+    }
+}
+
 int main(int argc, const char** argv)
 {
     g_logger.Init();
@@ -191,6 +240,7 @@ int main(int argc, const char** argv)
     {
         if (strcmp("thisProcess", argv[1]) == 0)
         {
+            ParseSettings(argc, argv, 2);
             AnalyzeHeapsForThisProcess();
         }
         else if (strcmp("remoteProcess", argv[1]) == 0)
@@ -198,6 +248,7 @@ int main(int argc, const char** argv)
             if (argc > 2)
             {
                 DWORD pid = std::strtoul(argv[2], NULL, 10);
+                ParseSettings(argc, argv, 3);
                 AnalyzeHeapsForProcess(pid);
             }
             else
@@ -207,6 +258,7 @@ int main(int argc, const char** argv)
         }
         else if (strcmp("dllInjectorTest", argv[1]) == 0)
         {
+            ParseSettings(argc, argv, 2);
             DllInjectorTest();
         }
         else

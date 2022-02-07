@@ -160,6 +160,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MinMax.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="WinapiHeap.h" />
   </ItemGroup>
   <ItemGroup>

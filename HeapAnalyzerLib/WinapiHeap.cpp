@@ -226,7 +226,7 @@ std::string HeapStats::ToString(bool includeRegions, const char* separator) cons
 
 bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats)
 {
-    static constexpr bool bLogBlocks = false;
+    extern Settings g_settings;
 
     g_logger.LogInfo("GetHeapStatistics: {} {}", hHeap, bIsLocked);
 
@@ -279,7 +279,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
 
     while (HeapWalk(hHeap, &heapEntry) != FALSE)
     {
-        if constexpr (bLogBlocks == true)
+        if (g_settings.bHeapEntryLogging == true)
             g_logger.LogInfo("Processing heap entry:\n{}", HeapEntryToString(heapEntry));
 
         if (heapEntry.wFlags == PROCESS_HEAP_UNCOMMITTED_RANGE)
