@@ -117,6 +117,8 @@ public:
     bool GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats);
     bool GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps, HeapsStats& heapsStats);
 
+    void GenerateAdditionalHeapStats(HeapStats& heapStats);
+
 private:
     std::string HeapFlagsToString(WORD flags);
     std::string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);

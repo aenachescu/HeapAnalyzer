@@ -202,9 +202,17 @@ std::string HeapStats::ToString(bool includeRegions, const char* separator) cons
     result += separator;
     result += uncommittedRangeStats.ToString(4, separator);
 
-    result += "Blocks without regions:";
-    result += separator;
-    result += bwrStats.ToString(4, separator);
+    if (bwrStats.total.num == 0)
+    {
+        result += "Blocks without regions: empty";
+        result += separator;
+    }
+    else
+    {
+        result += "Blocks without regions:";
+        result += separator;
+        result += bwrStats.ToString(4, separator);
+    }
 
     if (includeRegions == true)
     {
@@ -365,9 +373,6 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
         }
     }
 
-    if (bRes == true)
-        GenerateRegionsStats(heapStats);
-
 end:
 
     if (bIsLocked == false)
@@ -512,6 +517,11 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
         HeapFree(g_hWorkingHeap, 0, hHeaps);
 
     return bRes;
+}
+
+void HeapAnalyzer::GenerateAdditionalHeapStats(HeapStats& heapStats)
+{
+    GenerateRegionsStats(heapStats);
 }
 
 std::string HeapAnalyzer::HeapFlagsToString(WORD flags)
