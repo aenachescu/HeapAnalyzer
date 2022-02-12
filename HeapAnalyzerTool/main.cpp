@@ -228,6 +228,10 @@ void ParseSettings(int argc, const char** argv, int start)
         {
             g_settings.bHeapEntryLogging = true;
         }
+        else if (strcmp("SearchStrings", argv[i]) == 0)
+        {
+            g_settings.bSearchStrings = true;
+        }
         else
         {
             g_logger.LogError("unknown setting: [{}]", argv[i]);

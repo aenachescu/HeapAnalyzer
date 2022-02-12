@@ -342,6 +342,27 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
 
         if (heapEntry.wFlags == PROCESS_HEAP_ENTRY_BUSY)
         {
+            if (g_settings.bSearchStrings == true)
+            {
+                size_t blockSize = heapEntry.cbData;
+                size_t currentPosition = 0;
+                size_t overhead = heapEntry.cbOverhead;
+                char* str = reinterpret_cast<char*>(heapEntry.lpData);
+
+                if (str != nullptr)
+                {
+                    while (currentPosition < blockSize && str[currentPosition] != '\0' && isprint(str[currentPosition]) != 0)
+                        currentPosition++;
+
+                    if (currentPosition != 0 && str[currentPosition] == '\0')
+                    {
+                        std::string s(str, currentPosition);
+                        g_logger.LogInfo("Found string: [{}] ptr = {} strLength = {} blockSize = {} overhead = {}",
+                            s, heapEntry.lpData, currentPosition, blockSize, overhead);
+                    }
+                }
+            }
+
             UpdateBlocksStats(
                 lastUsedRegion != heapStats.regions.end() ? lastUsedRegion->used : heapStats.bwrStats.used,
                 heapEntry

@@ -7,4 +7,5 @@ struct Settings
     bool bWorkingHeapAllocatorLogging = false;
     bool bStatsPerRegionLogging = false;
     bool bHeapEntryLogging = false;
+    bool bSearchStrings = false;
 };
