@@ -6,18 +6,22 @@
 #include <string>
 #include <sstream>
 
-#include <Windows.h>
-
 void Logger::Init()
 {
-    std::lock_guard<std::recursive_mutex> _lock(m_lock);
-
     SetModulePathAndName();
 
     std::string logPath = m_modulePath + "log.txt";
 
-    m_file.open(logPath.data(), std::ios_base::app);
-    if (!m_file)
+    m_hFile = CreateFileA(
+        logPath.c_str(),
+        FILE_APPEND_DATA,
+        FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL,
+        OPEN_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+    if (m_hFile == INVALID_HANDLE_VALUE)
         return;
 
     m_pid = std::to_string(GetProcessId(GetCurrentProcess()));
@@ -32,12 +36,14 @@ void Logger::Init()
 
 void Logger::Uninit()
 {
-    std::lock_guard<std::recursive_mutex> _lock(m_lock);
-
     LogMessage(LogLevel::info, "uninitializing logger!");
 
     m_bIsInitialized = false;
-    m_file.close();
+    if (m_hFile != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(m_hFile);
+        m_hFile = INVALID_HANDLE_VALUE;
+    }
 }
 
 void Logger::AddPaddingToString(std::string& str, size_t expectedSize)
@@ -124,14 +130,17 @@ void Logger::LogMessage(LogLevel lvl, const std::string& msg)
         return tidStr;
     };
 
-    std::lock_guard<std::recursive_mutex> _lock(m_lock);
-
     if (m_bIsInitialized == false)
         return;
 
     auto currentTime = std::chrono::system_clock::now();
 
-    m_file << std::format("[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
+    auto logMsg = std::format("[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
         currentTime, LogLevelToString(lvl), m_processName, m_moduleName, m_pid, getCurrentThreadId(), msg);
-    m_file.flush();
+
+    OVERLAPPED overlapped = { 0 };
+    LockFileEx(m_hFile, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+    WriteFile(m_hFile, logMsg.data(), static_cast<DWORD>(logMsg.size()), NULL, NULL);
+    FlushFileBuffers(m_hFile);
+    UnlockFileEx(m_hFile, 0, MAXDWORD, MAXDWORD, &overlapped);
 }

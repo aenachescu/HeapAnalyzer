@@ -1,9 +1,10 @@
 #pragma once
 
-#include <fstream>
-#include <mutex>
 #include <string_view>
 #include <string>
+#include <format>
+
+#include <Windows.h>
 
 class Logger
 {
@@ -46,8 +47,7 @@ private:
     void LogMessage(LogLevel lvl, const std::string& msg);
 
 private:
-    std::ofstream m_file;
-    std::recursive_mutex m_lock;
+    HANDLE m_hFile = INVALID_HANDLE_VALUE;
     bool m_bIsInitialized = false;
     std::string m_processName = "<unknown>";
     std::string m_moduleName = "<unknown>";

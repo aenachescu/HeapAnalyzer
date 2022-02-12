@@ -2,8 +2,8 @@
 #include "pch.h"
 
 #include "Settings.h"
-#include "Logger.h"
 #include "WinapiHeap.h"
+#include "Logger.h"
 
 #include <Windows.h>
 

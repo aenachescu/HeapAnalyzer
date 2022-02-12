@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <ranges>
+#include <sstream>
 
 extern Logger g_logger;
 
