@@ -63,33 +63,18 @@ void AnalyzeHeapsForThisProcess()
 {
     g_logger.LogInfo("analyzing heaps for current process");
 
-    do {
-        g_hWorkingHeap = HeapCreate(0, 0, 0);
-        if (g_hWorkingHeap == NULL)
-        {
-            g_logger.LogError("failed to create working heap: {}", GetLastError());
-            break;
-        }
+    WinapiHeap::HeapsStats heapsStats;
+    WinapiHeap::HeapAnalyzer heapAnalyzer;
 
-        WinapiHeap::HeapsStats heapsStats;
-        WinapiHeap::HeapAnalyzer heapAnalyzer;
+    GenerateTestHeap();
 
-        GenerateTestHeap();
+    bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
+    g_logger.LogInfo("got statistics for {} heaps: {}", heapsStats.size(), bRes);
 
-        bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
-        g_logger.LogInfo("got statistics for {} heaps: {}", heapsStats.size(), bRes);
-
-        for (auto& s : heapsStats)
-        {
-            heapAnalyzer.GenerateAdditionalHeapStats(s);
-            g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
-        }
-    } while (false);
-
-    if (g_hWorkingHeap != NULL)
+    for (auto& s : heapsStats)
     {
-        HeapDestroy(g_hWorkingHeap);
-        g_hWorkingHeap = NULL;
+        heapAnalyzer.GenerateAdditionalHeapStats(s);
+        g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
     }
 }
 
@@ -241,7 +226,15 @@ void ParseSettings(int argc, const char** argv, int start)
 
 int main(int argc, const char** argv)
 {
+    g_hWorkingHeap = HeapCreate(0, 0, 0);
+    if (g_hWorkingHeap == NULL)
+    {
+        std::cout << "failed to create working heap: " << GetLastError() << std::endl;
+        return 1;
+    }
+
     g_logger.Init();
+    g_logger.LogInfo("Working heap: {}", g_hWorkingHeap);
 
     if (argc > 1)
     {
@@ -277,5 +270,7 @@ int main(int argc, const char** argv)
         g_logger.LogError("no command");
 
     g_logger.Uninit();
+    HeapDestroy(g_hWorkingHeap);
+
     return 0;
 }

@@ -16,46 +16,34 @@ DWORD WINAPI AnalyzeHeaps(LPVOID)
 {
     g_logger.LogInfo("analyzing heaps for current process");
 
-    do {
-        g_hWorkingHeap = HeapCreate(0, 0, 0);
-        if (g_hWorkingHeap == NULL)
-        {
-            g_logger.LogError("failed to create working heap: {}", GetLastError());
-            break;
-        }
+    WinapiHeap::HeapsStats heapsStats;
+    WinapiHeap::HeapAnalyzer heapAnalyzer;
 
-        g_logger.LogInfo("working heap: {}", g_hWorkingHeap);
+    bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
+    g_logger.LogInfo("got statistics for {} heaps: {}", heapsStats.size(), bRes);
 
-        WinapiHeap::HeapsStats heapsStats;
-        WinapiHeap::HeapAnalyzer heapAnalyzer;
-
-        bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
-        g_logger.LogInfo("got statistics for {} heaps: {}", heapsStats.size(), bRes);
-
-        for (auto& s : heapsStats)
-        {
-            heapAnalyzer.GenerateAdditionalHeapStats(s);
-            g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
-        }
-    } while (false);
-
-    if (g_hWorkingHeap != NULL)
+    for (auto& s : heapsStats)
     {
-        HeapDestroy(g_hWorkingHeap);
-        g_hWorkingHeap = NULL;
+        heapAnalyzer.GenerateAdditionalHeapStats(s);
+        g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
     }
 
     FreeLibraryAndExitThread(g_hDll, 0);
 }
 
-void OnProcessAttach()
+bool OnProcessAttach()
 {
+    g_hWorkingHeap = HeapCreate(0, 0, 0);
+    if (g_hWorkingHeap == NULL)
+        return false;
+
     g_logger.Init();
-    g_logger.LogInfo("OnProcessAttach called!");
+    g_logger.LogInfo("OnProcessAttach called! Working heap: {}", g_hWorkingHeap);
 
     HANDLE hThread = NULL;
     HANDLE hSharedMemory = NULL;
     Settings* sharedSettings = NULL;
+    bool bRet = false;
 
     do {
         hSharedMemory = OpenFileMappingA(FILE_MAP_ALL_ACCESS, FALSE, Settings::kSharedMemoryName);
@@ -80,6 +68,8 @@ void OnProcessAttach()
             g_logger.LogError("Failed to create thread AnalyzeHeaps: {}", GetLastError());
             break;
         }
+
+        bRet = true;
     } while (false);
 
     if (hThread != NULL)
@@ -90,12 +80,17 @@ void OnProcessAttach()
 
     if (hSharedMemory != NULL)
         CloseHandle(hSharedMemory);
+
+    return bRet;
 }
 
 void OnProcessDetach()
 {
     g_logger.LogInfo("OnProcessDetach called!");
     g_logger.Uninit();
+
+    if (g_hWorkingHeap != NULL)
+        HeapDestroy(g_hWorkingHeap);
 }
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
@@ -106,8 +101,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
     {
     case DLL_PROCESS_ATTACH:
         g_hDll = hModule;
-        OnProcessAttach();
-        break;
+        return OnProcessAttach() == true ? TRUE : FALSE;
     case DLL_THREAD_ATTACH:
     case DLL_THREAD_DETACH:
         break;
