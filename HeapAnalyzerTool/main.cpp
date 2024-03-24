@@ -83,7 +83,7 @@ void AnalyzeHeapsForProcess(DWORD pid)
     static constexpr char kDllName[] = "HeapAnalyzerDll.dll";
 
     char moduleFileName[MAX_PATH];
-    std::string dllPath;
+    WH_string dllPath;
     void* dllPathRemote = NULL;
     HANDLE hThread = NULL;
     HANDLE hProcess = NULL;
@@ -193,7 +193,7 @@ void DllInjectorTest()
 {
     g_logger.LogInfo("dll injector test");
     GenerateTestHeap();
-    std::string s;
+    WH_string s;
     std::cin >> s;
 }
 
@@ -201,11 +201,7 @@ void ParseSettings(int argc, const char** argv, int start)
 {
     for (int i = start; i < argc; i++)
     {
-        if (strcmp("WorkingHeapAllocatorLogging", argv[i]) == 0)
-        {
-            g_settings.bWorkingHeapAllocatorLogging = true;
-        }
-        else if (strcmp("StatsPerRegionLogging", argv[i]) == 0)
+        if (strcmp("StatsPerRegionLogging", argv[i]) == 0)
         {
             g_settings.bStatsPerRegionLogging = true;
         }

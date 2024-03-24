@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Logger.h"
-#include "Settings.h"
-
 #include <exception>
 #include <limits>
+#include <string>
+#include <vector>
+#include <sstream>
 
 #include <Windows.h>
 
@@ -34,31 +34,22 @@ struct WorkingHeapAllocator
 
         if (auto p = reinterpret_cast<T*>(HeapAlloc(g_hWorkingHeap, 0, n * sizeof(T))))
         {
-            report(p, n);
             return p;
         }
 
         throw std::bad_alloc();
     }
 
-    void deallocate(T* p, std::size_t n) noexcept
+    void deallocate(T* p, [[maybe_unused]] std::size_t n) noexcept
     {
         extern HANDLE g_hWorkingHeap;
 
-        report(p, n, false);
         HeapFree(g_hWorkingHeap, 0, p);
     }
-
-private:
-    void report(T* p, std::size_t n, bool alloc = true) const
-    {
-        extern Settings g_settings;
-        if (g_settings.bWorkingHeapAllocatorLogging == true)
-        {
-            extern Logger g_logger;
-            g_logger.LogInfo("{} {} ({} * {}) bytes at {}",
-                alloc ? "allocate" : "deallocate",
-                sizeof(T) * n, sizeof(T), n, reinterpret_cast<void*>(p));
-        }
-    }
 };
+
+using WH_string = std::basic_string<char, std::char_traits<char>, WorkingHeapAllocator<char>>;
+using WH_ostringstream = std::basic_ostringstream<char, std::char_traits<char>, WorkingHeapAllocator<char>>;
+
+template<typename T>
+using WH_vector = std::vector<T, WorkingHeapAllocator<T>>;

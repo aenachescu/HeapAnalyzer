@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Logger.h"
+#include "StringUtils.h"
 
 #include <chrono>
 #include <thread>
@@ -8,9 +9,11 @@
 
 void Logger::Init()
 {
+    m_pStrings = std::unique_ptr<Strings, Strings::Deleter>{ WorkingHeapAllocator<Strings>().allocate(1) };
+
     SetModulePathAndName();
 
-    std::string logPath = m_modulePath + "log.txt";
+    WH_string logPath = m_pStrings->m_modulePath + "log.txt";
 
     m_hFile = CreateFileA(
         logPath.c_str(),
@@ -24,8 +27,8 @@ void Logger::Init()
     if (m_hFile == INVALID_HANDLE_VALUE)
         return;
 
-    m_pid = std::to_string(GetProcessId(GetCurrentProcess()));
-    AddPaddingToString(m_pid, kPidSize);
+    m_pStrings->m_pid = to_wh_string(GetProcessId(GetCurrentProcess()));
+    AddPaddingToString(m_pStrings->m_pid, kPidSize);
 
     SetProcessName();
 
@@ -44,12 +47,14 @@ void Logger::Uninit()
         CloseHandle(m_hFile);
         m_hFile = INVALID_HANDLE_VALUE;
     }
+
+    m_pStrings.reset();
 }
 
-void Logger::AddPaddingToString(std::string& str, size_t expectedSize)
+void Logger::AddPaddingToString(WH_string& str, size_t expectedSize)
 {
     if (str.size() < expectedSize)
-        str += std::string(expectedSize - str.size(), ' ');
+        str += WH_string(expectedSize - str.size(), ' ');
 }
 
 void Logger::SetProcessName()
@@ -58,13 +63,13 @@ void Logger::SetProcessName()
 
     if (GetModuleFileNameA(NULL, procName, sizeof(procName)) != 0)
     {
-        m_processName = procName;
+        m_pStrings->m_processName = procName;
 
-        auto found = m_processName.find_last_of('\\');
-        if (found != std::string::npos)
-            m_processName.erase(m_processName.begin(), m_processName.begin() + found + 1);
+        auto found = m_pStrings->m_processName.find_last_of('\\');
+        if (found != WH_string::npos)
+            m_pStrings->m_processName.erase(m_pStrings->m_processName.begin(), m_pStrings->m_processName.begin() + found + 1);
 
-        AddPaddingToString(m_processName, kProcessNameSize);
+        AddPaddingToString(m_pStrings->m_processName, kProcessNameSize);
     }
 }
 
@@ -87,21 +92,21 @@ void Logger::SetModulePathAndName()
     if (GetModuleFileNameA(hModule, moduleFileName, sizeof(moduleFileName)) == 0)
         return;
 
-    m_modulePath = moduleFileName;
+    m_pStrings->m_modulePath = moduleFileName;
 
-    auto found = m_modulePath.find_last_of('\\');
-    if (found != std::string::npos)
+    auto found = m_pStrings->m_modulePath.find_last_of('\\');
+    if (found != WH_string::npos)
     {
-        m_moduleName = m_modulePath.substr(found + 1);
-        m_modulePath.erase(m_modulePath.begin() + found + 1, m_modulePath.end());
+        m_pStrings->m_moduleName = m_pStrings->m_modulePath.substr(found + 1);
+        m_pStrings->m_modulePath.erase(m_pStrings->m_modulePath.begin() + found + 1, m_pStrings->m_modulePath.end());
     }
     else
     {
-        m_moduleName = m_modulePath;
-        m_modulePath = "";
+        m_pStrings->m_moduleName = m_pStrings->m_modulePath;
+        m_pStrings->m_modulePath = "";
     }
 
-    AddPaddingToString(m_moduleName, kModuleNameSize);
+    AddPaddingToString(m_pStrings->m_moduleName, kModuleNameSize);
 }
 
 const char* Logger::LogLevelToString(LogLevel lvl)
@@ -117,14 +122,14 @@ const char* Logger::LogLevelToString(LogLevel lvl)
     return "-----";
 }
 
-void Logger::LogMessage(LogLevel lvl, const std::string& msg)
+void Logger::LogMessage(LogLevel lvl, const WH_string& msg)
 {
-    auto getCurrentThreadId = [&]() -> std::string
+    auto getCurrentThreadId = [&]() -> WH_string
     {
-        std::ostringstream ss;
+        WH_ostringstream ss;
         ss << std::this_thread::get_id();
 
-        std::string tidStr = ss.str();
+        WH_string tidStr = ss.str();
         AddPaddingToString(tidStr, kTidSize);
 
         return tidStr;
@@ -135,8 +140,15 @@ void Logger::LogMessage(LogLevel lvl, const std::string& msg)
 
     auto currentTime = std::chrono::system_clock::now();
 
-    auto logMsg = std::format("[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
-        currentTime, LogLevelToString(lvl), m_processName, m_moduleName, m_pid, getCurrentThreadId(), msg);
+    WH_string logMsg;
+    std::format_to(std::back_inserter(logMsg), "[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
+        currentTime,
+        LogLevelToString(lvl),
+        m_pStrings->m_processName,
+        m_pStrings->m_moduleName,
+        m_pStrings->m_pid,
+        getCurrentThreadId(),
+        msg);
 
     OVERLAPPED overlapped = { 0 };
     LockFileEx(m_hFile, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);

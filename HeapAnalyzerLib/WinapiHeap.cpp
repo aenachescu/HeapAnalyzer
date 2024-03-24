@@ -1,10 +1,11 @@
 #include "pch.h"
 #include "WinapiHeap.h"
 #include "Logger.h"
+#include "StringUtils.h"
+#include "Settings.h"
 
 #include <algorithm>
 #include <ranges>
-#include <sstream>
 
 extern Logger g_logger;
 
@@ -19,27 +20,27 @@ concept MinMaxConcept = requires(T a)
 };
 
 template<MinMaxConcept T>
-std::string MinMaxToString(T& val, const char* text = "", size_t identation = 0, const char* counterText = " Count: ")
+WH_string MinMaxToString(T& val, const char* text = "", size_t identation = 0, const char* counterText = " Count: ")
 {
-    std::string result(identation, ' ');
+    WH_string result(identation, ' ');
     result += text;
-    result += std::to_string(val.getValue());
+    result += to_wh_string(val.getValue());
     result += counterText;
-    result += std::to_string(val.getCounter());
+    result += to_wh_string(val.getCounter());
 
     return result;
 }
 
-static std::string NormalizeFieldName(const char* fieldName, size_t maxFieldName)
+static WH_string NormalizeFieldName(const char* fieldName, size_t maxFieldName)
 {
-    std::string result = fieldName;
+    WH_string result = fieldName;
     result.append(maxFieldName - result.size(), ' ');
     result += " : ";
 
     return result;
 }
 
-static std::string HeapInfoToStr(ULONG info)
+static WH_string HeapInfoToStr(ULONG info)
 {
     static constexpr ULONG kStandard = 0;
     static constexpr ULONG kLookAsideLists = 1;
@@ -57,17 +58,17 @@ static std::string HeapInfoToStr(ULONG info)
         break;
     }
 
-    return std::to_string(info);
+    return to_wh_string(info);
 }
 
-static std::string PointerToString(void* ptr)
+static WH_string PointerToString(void* ptr)
 {
-    std::ostringstream ss;
+    WH_ostringstream ss;
     ss << ptr;
     return ss.str();
 }
 
-std::string HeapStats::BlocksStats::ToString(const char* blockName, size_t identation, const char* separator) const
+WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("Num"), sizeof("Size"), sizeof("Overhead"),
@@ -75,17 +76,17 @@ std::string HeapStats::BlocksStats::ToString(const char* blockName, size_t ident
         sizeof("LongestOh"), sizeof("ShortestBnO"), sizeof("LongestBnO"),
     }) - 1;
 
-    std::string result;
-    std::string identationStr = std::string(identation, ' ');
+    WH_string result;
+    WH_string identationStr = WH_string(identation, ' ');
 
     result += identationStr + "Blocks stats - " + blockName + separator;
 
     identation += 4;
-    identationStr = std::string(identation, ' ');
+    identationStr = WH_string(identation, ' ');
 
-    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + std::to_string(num) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + std::to_string(size) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + std::to_string(overhead) + separator;
+    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + to_wh_string(num) + separator;
+    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(size) + separator;
+    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(overhead) + separator;
 
     result += MinMaxToString(shortestBlock, NormalizeFieldName("Shortest", kMaxFieldName).c_str(), identation) + separator;
     result += MinMaxToString(longestBlock, NormalizeFieldName("Longest", kMaxFieldName).c_str(), identation) + separator;
@@ -97,24 +98,24 @@ std::string HeapStats::BlocksStats::ToString(const char* blockName, size_t ident
     return result;
 }
 
-std::string HeapStats::RegionStats::ToString(size_t identation, const char* separator) const
+WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("Start"), sizeof("End"), sizeof("Size"),
         sizeof("Overhead"), sizeof("Committed"), sizeof("Uncommitted"),
     }) - 1;
 
-    std::string result;
-    std::string identationStr = std::string(identation, ' ');
+    WH_string result;
+    WH_string identationStr = WH_string(identation, ' ');
 
     result += identationStr + NormalizeFieldName("Start", kMaxFieldName) +
         PointerToString(reinterpret_cast<void*>(regionStart)) + separator;
     result += identationStr + NormalizeFieldName("End", kMaxFieldName) +
         PointerToString(reinterpret_cast<void*>(regionEnd)) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + std::to_string(regionSize) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + std::to_string(regionOverhead) + separator;
-    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + std::to_string(regionCommittedSize) + separator;
-    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + std::to_string(regionUncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(regionSize) + separator;
+    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(regionOverhead) + separator;
+    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + to_wh_string(regionCommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + to_wh_string(regionUncommittedSize) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -123,7 +124,7 @@ std::string HeapStats::RegionStats::ToString(size_t identation, const char* sepa
     return result;
 }
 
-std::string HeapStats::RegionsStats::ToString(size_t identation, const char* separator) const
+WH_string HeapStats::RegionsStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("NumberOfRegions"), sizeof("Size"), sizeof("Overhead"), sizeof("Committed"), sizeof("Uncommitted"),
@@ -131,14 +132,14 @@ std::string HeapStats::RegionsStats::ToString(size_t identation, const char* sep
         sizeof("LongestCommitted"), sizeof("ShortestCommitted"), sizeof("LongestUncommitted"), sizeof("ShortestUncommitted"),
     }) - 1;
 
-    std::string result;
-    std::string identationStr = std::string(identation, ' ');
+    WH_string result;
+    WH_string identationStr = WH_string(identation, ' ');
 
-    result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + std::to_string(numberOfRegions) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + std::to_string(size) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + std::to_string(overhead) + separator;
-    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + std::to_string(committedSize) + separator;
-    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + std::to_string(uncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + to_wh_string(numberOfRegions) + separator;
+    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(size) + separator;
+    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(overhead) + separator;
+    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + to_wh_string(committedSize) + separator;
+    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + to_wh_string(uncommittedSize) + separator;
 
     result += MinMaxToString(longestSize, NormalizeFieldName("LongestSize", kMaxFieldName).c_str(), identation) + separator;
     result += MinMaxToString(shortestSize, NormalizeFieldName("ShortestSize", kMaxFieldName).c_str(), identation) + separator;
@@ -156,9 +157,9 @@ std::string HeapStats::RegionsStats::ToString(size_t identation, const char* sep
     return result;
 }
 
-std::string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, const char* separator) const
+WH_string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, const char* separator) const
 {
-    std::string result;
+    WH_string result;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -167,29 +168,29 @@ std::string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, con
     return result;
 }
 
-std::string HeapStats::UncommittedRangeStats::ToString(size_t identation, const char* separator) const
+WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("Num"), sizeof("Size"), sizeof("Shortest"),
         sizeof("Longest"), sizeof("Overhead"), sizeof("RegIdx"),
     }) - 1;
 
-    std::string result;
-    std::string identationStr = std::string(identation, ' ');
+    WH_string result;
+    WH_string identationStr = WH_string(identation, ' ');
 
-    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + std::to_string(numOfRanges) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + std::to_string(totalSize) + separator;
+    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + to_wh_string(numOfRanges) + separator;
+    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(totalSize) + separator;
     result += MinMaxToString(shortestRange, NormalizeFieldName("Shortest", kMaxFieldName).c_str(), identation) + separator;
     result += MinMaxToString(longestRange, NormalizeFieldName("Longest", kMaxFieldName).c_str(), identation) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + std::to_string(longestOverhead.getValue()) + separator;
-    result += identationStr + NormalizeFieldName("RegIdx", kMaxFieldName) + std::to_string(biggestRegionIndex.getValue()) + separator;
+    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(longestOverhead.getValue()) + separator;
+    result += identationStr + NormalizeFieldName("RegIdx", kMaxFieldName) + to_wh_string(biggestRegionIndex.getValue()) + separator;
 
     return result;
 }
 
-std::string HeapStats::ToString(bool includeRegions, const char* separator) const
+WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
 {
-    std::string result;
+    WH_string result;
     bool bFirstRegion = true;
 
     result += "Heap: " + PointerToString(reinterpret_cast<void*>(heapAddress)) + separator;
@@ -224,7 +225,7 @@ std::string HeapStats::ToString(bool includeRegions, const char* separator) cons
             if (bFirstRegion == true)
                 bFirstRegion = false;
             else
-                result += "    " + std::string(50, '-') + separator;
+                result += "    " + WH_string(50, '-') + separator;
 
             result += r.ToString(4, separator);
         }
@@ -357,7 +358,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
 
                     if (currentPosition != 0 && str[currentPosition] == '\0')
                     {
-                        std::string s(str, currentPosition);
+                        WH_string s(str, currentPosition);
                         g_logger.LogInfo("Found string: [{}] ptr = {} strLength = {} blockSize = {} overhead = {}",
                             s, heapEntry.lpData, currentPosition, blockSize, overhead);
                     }
@@ -419,7 +420,7 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
 
     extern HANDLE g_hWorkingHeap;
 
-    using HeapsVector = std::vector<HANDLE, WorkingHeapAllocator<HANDLE>>;
+    using HeapsVector = WH_vector<HANDLE>;
 
     auto isIgnoredHeap = [&](HANDLE h) { return std::find(ignoredHeaps.begin(), ignoredHeaps.end(), h) != ignoredHeaps.end(); };
 
@@ -546,9 +547,9 @@ void HeapAnalyzer::GenerateAdditionalHeapStats(HeapStats& heapStats)
     GenerateRegionsStats(heapStats);
 }
 
-std::string HeapAnalyzer::HeapFlagsToString(WORD flags)
+WH_string HeapAnalyzer::HeapFlagsToString(WORD flags)
 {
-    std::string res;
+    WH_string res;
     auto addFlag = [&](WORD f, const char* str)
     {
         if ((flags & f) == 0)
@@ -570,7 +571,7 @@ std::string HeapAnalyzer::HeapFlagsToString(WORD flags)
     return res;
 }
 
-std::string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
+WH_string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
 {
     static constexpr char kSeparator[] = "\n";
     static constexpr size_t kMaxFieldName = std::max({
@@ -579,12 +580,12 @@ std::string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
         sizeof("CSize"), sizeof("USize"), sizeof("FBlock"), sizeof("LBlock"),
     }) - 1;
 
-    std::string result;
+    WH_string result;
 
     result += NormalizeFieldName("Address", kMaxFieldName) + PointerToString(heapEntry.lpData) + kSeparator;
-    result += NormalizeFieldName("Size", kMaxFieldName) + std::to_string(heapEntry.cbData) + kSeparator;
-    result += NormalizeFieldName("Overhead", kMaxFieldName) + std::to_string(static_cast<unsigned int>(heapEntry.cbOverhead)) + kSeparator;
-    result += NormalizeFieldName("RegIndex", kMaxFieldName) + std::to_string(static_cast<unsigned int>(heapEntry.iRegionIndex)) + kSeparator;
+    result += NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(heapEntry.cbData) + kSeparator;
+    result += NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(static_cast<unsigned int>(heapEntry.cbOverhead)) + kSeparator;
+    result += NormalizeFieldName("RegIndex", kMaxFieldName) + to_wh_string(static_cast<unsigned int>(heapEntry.iRegionIndex)) + kSeparator;
     result += NormalizeFieldName("Flags", kMaxFieldName) + HeapFlagsToString(heapEntry.wFlags) + kSeparator;
 
     if ((heapEntry.wFlags & PROCESS_HEAP_ENTRY_BUSY) != 0 && (heapEntry.wFlags & PROCESS_HEAP_ENTRY_MOVEABLE) != 0)
@@ -592,8 +593,8 @@ std::string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
 
     if ((heapEntry.wFlags & PROCESS_HEAP_REGION) != 0)
     {
-        result += NormalizeFieldName("CSize", kMaxFieldName) + std::to_string(heapEntry.Region.dwCommittedSize) + kSeparator;
-        result += NormalizeFieldName("USize", kMaxFieldName) + std::to_string(heapEntry.Region.dwUnCommittedSize) + kSeparator;
+        result += NormalizeFieldName("CSize", kMaxFieldName) + to_wh_string(heapEntry.Region.dwCommittedSize) + kSeparator;
+        result += NormalizeFieldName("USize", kMaxFieldName) + to_wh_string(heapEntry.Region.dwUnCommittedSize) + kSeparator;
         result += NormalizeFieldName("FBlock", kMaxFieldName) + PointerToString(heapEntry.Region.lpFirstBlock) + kSeparator;
         result += NormalizeFieldName("LBlock", kMaxFieldName) + PointerToString(heapEntry.Region.lpLastBlock) + kSeparator;
     }

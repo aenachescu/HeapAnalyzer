@@ -1,8 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <string>
-
 #include "MinMax.h"
 #include "Allocator.h"
 
@@ -28,7 +25,7 @@ struct HeapStats
         MinValueAndCount<> shortestBlockWithOverhead;
         MaxValueAndCount<> longestBlockWithOverhead;
 
-        std::string ToString(const char* blockName, size_t identation, const char* separator) const;
+        WH_string ToString(const char* blockName, size_t identation, const char* separator) const;
     };
 
     struct RegionStats
@@ -44,7 +41,7 @@ struct HeapStats
         BlocksStats used;
         BlocksStats free;
 
-        std::string ToString(size_t identation, const char* separator) const;
+        WH_string ToString(size_t identation, const char* separator) const;
     };
 
     struct RegionsStats
@@ -68,7 +65,7 @@ struct HeapStats
         BlocksStats used;
         BlocksStats free;
 
-        std::string ToString(size_t identation, const char* separator) const;
+        WH_string ToString(size_t identation, const char* separator) const;
     };
 
     struct BlocksWithoutRegionStats
@@ -77,7 +74,7 @@ struct HeapStats
         BlocksStats used;
         BlocksStats free;
 
-        std::string ToString(size_t identation, const char* separator) const;
+        WH_string ToString(size_t identation, const char* separator) const;
     };
 
     struct UncommittedRangeStats
@@ -91,10 +88,10 @@ struct HeapStats
         MaxValue<> longestOverhead;
         MaxValue<> biggestRegionIndex;
 
-        std::string ToString(size_t identation, const char* separator) const;
+        WH_string ToString(size_t identation, const char* separator) const;
     };
 
-    using Regions = std::vector<RegionStats, WorkingHeapAllocator<RegionStats>>;
+    using Regions = WH_vector<RegionStats>;
 
     PVOID heapAddress = NULL;
     ULONG heapInfo = 0;
@@ -103,10 +100,10 @@ struct HeapStats
     BlocksWithoutRegionStats bwrStats;
     Regions regions;
 
-    std::string ToString(bool includeRegions = false, const char* separator = "\n") const;
+    WH_string ToString(bool includeRegions = false, const char* separator = "\n") const;
 };
 
-using HeapsStats = std::vector<HeapStats, WorkingHeapAllocator<HeapStats>>;
+using HeapsStats = WH_vector<HeapStats>;
 
 class HeapAnalyzer
 {
@@ -120,8 +117,8 @@ public:
     void GenerateAdditionalHeapStats(HeapStats& heapStats);
 
 private:
-    std::string HeapFlagsToString(WORD flags);
-    std::string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
+    WH_string HeapFlagsToString(WORD flags);
+    WH_string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
 
     void UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry);
     void GenerateRegionsStats(HeapStats& heapStats);
