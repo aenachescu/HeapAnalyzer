@@ -89,8 +89,10 @@ void AnalyzeHeapsForProcess(DWORD pid)
     HANDLE hProcess = NULL;
     HANDLE hSharedMemory = NULL;
     HMODULE hKernel32 = NULL;
-    BOOL bRes = FALSE;
     Settings* sharedSettings = NULL;
+    DWORD exitCode = 0;
+    DWORD waitRes = WAIT_FAILED;
+    BOOL bRes = FALSE;
 
     do {
         if (GetModuleFileNameA(NULL, moduleFileName, sizeof(moduleFileName)) == 0)
@@ -169,8 +171,28 @@ void AnalyzeHeapsForProcess(DWORD pid)
             break;
         }
 
-        auto r = WaitForSingleObject(hThread, INFINITE);
-        g_logger.LogInfo("wait for remote thread: {}", r);
+        waitRes = WaitForSingleObject(hThread, INFINITE);
+        if (waitRes != WAIT_OBJECT_0)
+        {
+            g_logger.LogError("wait for remote thread failed: {}", waitRes);
+            break;
+        }
+
+        bRes = GetExitCodeThread(hThread, &exitCode);
+        if (bRes == FALSE)
+        {
+            g_logger.LogError("failed to get remote thread exit code: {}", GetLastError());
+            break;
+        }
+
+        if (exitCode == 0)
+        {
+            g_logger.LogError("failed to inject dll");
+        }
+        else
+        {
+            g_logger.LogInfo("dll injected successfully");
+        }
     } while (false);
 
     if (hThread != NULL)
