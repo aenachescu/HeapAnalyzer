@@ -85,8 +85,8 @@ struct HeapStats
         MinValueAndCount<> shortestRange;
         MaxValueAndCount<> longestRange;
 
-        MaxValue<> longestOverhead;
-        MaxValue<> biggestRegionIndex;
+        MinValueAndCount<> shortestOverhead;
+        MaxValueAndCount<> longestOverhead;
 
         WH_string ToString(size_t identation, const char* separator) const;
     };

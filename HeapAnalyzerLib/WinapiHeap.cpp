@@ -172,7 +172,7 @@ WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const ch
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("Num"), sizeof("Size"), sizeof("Shortest"),
-        sizeof("Longest"), sizeof("Overhead"), sizeof("RegIdx"),
+        sizeof("Longest"), sizeof("ShortestOverhead"), sizeof("LongestOverhead"),
     }) - 1;
 
     WH_string result;
@@ -182,8 +182,8 @@ WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const ch
     result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(totalSize) + separator;
     result += MinMaxToString(shortestRange, NormalizeFieldName("Shortest", kMaxFieldName).c_str(), identation) + separator;
     result += MinMaxToString(longestRange, NormalizeFieldName("Longest", kMaxFieldName).c_str(), identation) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(longestOverhead.getValue()) + separator;
-    result += identationStr + NormalizeFieldName("RegIdx", kMaxFieldName) + to_wh_string(biggestRegionIndex.getValue()) + separator;
+    result += MinMaxToString(shortestOverhead, NormalizeFieldName("ShortestOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(longestOverhead, NormalizeFieldName("LongestOverhead", kMaxFieldName).c_str(), identation) + separator;
 
     return result;
 }
@@ -300,8 +300,8 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
             heapStats.uncommittedRangeStats.shortestRange = heapEntry.cbData;
             heapStats.uncommittedRangeStats.longestRange = heapEntry.cbData;
 
+            heapStats.uncommittedRangeStats.shortestOverhead = heapEntry.cbOverhead;
             heapStats.uncommittedRangeStats.longestOverhead = heapEntry.cbOverhead;
-            heapStats.uncommittedRangeStats.biggestRegionIndex = heapEntry.iRegionIndex;
 
             continue;
         }
