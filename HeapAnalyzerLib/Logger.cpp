@@ -13,7 +13,7 @@ void Logger::Init()
 
     SetModulePathAndName();
 
-    WH_string logPath = m_pStrings->m_modulePath + "log.txt";
+    WH_string logPath = m_pStrings->m_modulePath + "HeapAnalyzer.log";
 
     m_hFile = CreateFileA(
         logPath.c_str(),
