@@ -44,7 +44,7 @@ struct HeapStats
         WH_string ToString(size_t identation, const char* separator) const;
     };
 
-    struct RegionsStats
+    struct RegionsSummary
     {
         size_t numberOfRegions = 0;
         size_t size = 0;
@@ -95,7 +95,7 @@ struct HeapStats
 
     PVOID heapAddress = NULL;
     ULONG heapInfo = 0;
-    RegionsStats regionsStats;
+    RegionsSummary regionsSummary;
     UncommittedRangeStats uncommittedRangeStats;
     BlocksWithoutRegionStats bwrStats;
     Regions regions;
@@ -121,7 +121,7 @@ private:
     WH_string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
 
     void UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry);
-    void GenerateRegionsStats(HeapStats& heapStats);
+    void GenerateRegionsSummary(HeapStats& heapStats);
     void MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src);
 
     bool RegionExists(const HeapStats& heapStats, const PROCESS_HEAP_ENTRY& entry);

@@ -73,7 +73,6 @@ void AnalyzeHeapsForThisProcess()
 
     for (auto& s : heapsStats)
     {
-        heapAnalyzer.GenerateAdditionalHeapStats(s);
         g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
     }
 }

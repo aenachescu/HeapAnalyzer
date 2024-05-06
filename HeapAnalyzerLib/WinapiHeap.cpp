@@ -124,7 +124,7 @@ WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separa
     return result;
 }
 
-WH_string HeapStats::RegionsStats::ToString(size_t identation, const char* separator) const
+WH_string HeapStats::RegionsSummary::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("NumberOfRegions"), sizeof("Size"), sizeof("Overhead"), sizeof("Committed"), sizeof("Uncommitted"),
@@ -196,9 +196,9 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
     result += "Heap: " + PointerToString(reinterpret_cast<void*>(heapAddress)) + separator;
     result += "Info: " + HeapInfoToStr(heapInfo) + separator;
 
-    result += "Regions stats:";
+    result += "Regions summary:";
     result += separator;
-    result += regionsStats.ToString(4, separator);
+    result += regionsSummary.ToString(4, separator);
 
     result += "Uncommitted range stats:";
     result += separator;
@@ -396,6 +396,8 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
         }
     }
 
+    GenerateRegionsSummary(heapStats);
+
 end:
 
     if (bIsLocked == false)
@@ -542,11 +544,6 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
     return bRes;
 }
 
-void HeapAnalyzer::GenerateAdditionalHeapStats(HeapStats& heapStats)
-{
-    GenerateRegionsStats(heapStats);
-}
-
 WH_string HeapAnalyzer::HeapFlagsToString(WORD flags)
 {
     WH_string res;
@@ -620,31 +617,31 @@ void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const 
     blocksStats.longestBlockWithOverhead = blockSizeWithOverhead;
 }
 
-void HeapAnalyzer::GenerateRegionsStats(HeapStats& heapStats)
+void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
 {
     for (const auto& reg : heapStats.regions)
     {
-        heapStats.regionsStats.numberOfRegions++;
-        heapStats.regionsStats.size += reg.regionSize;
-        heapStats.regionsStats.overhead += reg.regionOverhead;
-        heapStats.regionsStats.committedSize += reg.regionCommittedSize;
-        heapStats.regionsStats.uncommittedSize += reg.regionUncommittedSize;
+        heapStats.regionsSummary.numberOfRegions++;
+        heapStats.regionsSummary.size += reg.regionSize;
+        heapStats.regionsSummary.overhead += reg.regionOverhead;
+        heapStats.regionsSummary.committedSize += reg.regionCommittedSize;
+        heapStats.regionsSummary.uncommittedSize += reg.regionUncommittedSize;
 
-        heapStats.regionsStats.longestSize = reg.regionSize;
-        heapStats.regionsStats.shortestSize = reg.regionSize;
+        heapStats.regionsSummary.longestSize = reg.regionSize;
+        heapStats.regionsSummary.shortestSize = reg.regionSize;
 
-        heapStats.regionsStats.longestOverhead = reg.regionOverhead;
-        heapStats.regionsStats.shortestOverhead = reg.regionOverhead;
+        heapStats.regionsSummary.longestOverhead = reg.regionOverhead;
+        heapStats.regionsSummary.shortestOverhead = reg.regionOverhead;
 
-        heapStats.regionsStats.longestCommittedSize = reg.regionCommittedSize;
-        heapStats.regionsStats.shortestCommittedSize = reg.regionCommittedSize;
+        heapStats.regionsSummary.longestCommittedSize = reg.regionCommittedSize;
+        heapStats.regionsSummary.shortestCommittedSize = reg.regionCommittedSize;
 
-        heapStats.regionsStats.longestUncommittedSize = reg.regionUncommittedSize;
-        heapStats.regionsStats.shortestUncommittedSize = reg.regionUncommittedSize;
+        heapStats.regionsSummary.longestUncommittedSize = reg.regionUncommittedSize;
+        heapStats.regionsSummary.shortestUncommittedSize = reg.regionUncommittedSize;
 
-        MergeBlocksStats(heapStats.regionsStats.total, reg.total);
-        MergeBlocksStats(heapStats.regionsStats.used, reg.used);
-        MergeBlocksStats(heapStats.regionsStats.free, reg.free);
+        MergeBlocksStats(heapStats.regionsSummary.total, reg.total);
+        MergeBlocksStats(heapStats.regionsSummary.used, reg.used);
+        MergeBlocksStats(heapStats.regionsSummary.free, reg.free);
     }
 }
 
