@@ -24,7 +24,7 @@ WH_string MinMaxToString(T& val, const char* text = "", size_t identation = 0, c
 {
     WH_string result(identation, ' ');
     result += text;
-    result += to_wh_string(val.getValue());
+    result += val.getCounter() > 0 ? to_wh_string(val.getValue()) : "NaN";
     result += counterText;
     result += to_wh_string(val.getCounter());
 
