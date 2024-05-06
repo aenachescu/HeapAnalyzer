@@ -69,7 +69,7 @@ void AnalyzeHeapsForThisProcess()
     GenerateTestHeap();
 
     bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
-    g_logger.LogInfo("got statistics for {} heaps: {}", heapsStats.size(), bRes);
+    g_logger.LogInfo("collected statistics for {} heaps: {}", heapsStats.size(), bRes);
 
     for (auto& s : heapsStats)
     {

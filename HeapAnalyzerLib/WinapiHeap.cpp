@@ -461,7 +461,7 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
 
             if (tmp != numOfHeaps)
             {
-                g_logger.LogError("got {} heaps, but expected {}", tmp, numOfHeaps);
+                g_logger.LogError("found {} heaps, but expected {}", tmp, numOfHeaps);
                 HeapFree(g_hWorkingHeap, 0, hHeaps);
                 hHeaps = NULL;
                 continue;
@@ -477,7 +477,7 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
             break;
         }
 
-        g_logger.LogInfo("got {} heaps", numOfHeaps);
+        g_logger.LogInfo("found {} heaps", numOfHeaps);
 
         lockedHeaps.reserve(numOfHeaps);
 
@@ -527,7 +527,7 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
             }
             else
             {
-                g_logger.LogInfo("got statistics for heap: {}", h);
+                g_logger.LogInfo("collected statistics for heap: {}", h);
                 heapsStats.push_back(std::move(stats));
             }
 
