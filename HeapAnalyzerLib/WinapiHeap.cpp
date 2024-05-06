@@ -220,7 +220,7 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
     {
         result += "Regions:";
         result += separator;
-        for (const auto& r : regions)
+        for (const auto& r : regionsStats)
         {
             if (bFirstRegion == true)
                 bFirstRegion = false;
@@ -273,7 +273,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
     bool bRes = true;
     BOOL bWinRes = FALSE;
     PROCESS_HEAP_ENTRY heapEntry;
-    auto lastUsedRegion = heapStats.regions.end();
+    auto lastUsedRegion = heapStats.regionsStats.end();
 
     heapEntry.lpData = NULL;
 
@@ -324,9 +324,9 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
             reg.regionCommittedSize = heapEntry.Region.dwCommittedSize;
             reg.regionUncommittedSize = heapEntry.Region.dwUnCommittedSize;
 
-            heapStats.regions.push_back(std::move(reg));
+            heapStats.regionsStats.push_back(std::move(reg));
 
-            lastUsedRegion = heapStats.regions.end();
+            lastUsedRegion = heapStats.regionsStats.end();
 
             continue;
         }
@@ -337,7 +337,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
                 lastUsedRegion = GetRegion(heapStats, heapEntry);
 
             UpdateBlocksStats(
-                lastUsedRegion != heapStats.regions.end() ? lastUsedRegion->total : heapStats.bwrStats.total,
+                lastUsedRegion != heapStats.regionsStats.end() ? lastUsedRegion->total : heapStats.bwrStats.total,
                 heapEntry
             );
         }
@@ -366,7 +366,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
             }
 
             UpdateBlocksStats(
-                lastUsedRegion != heapStats.regions.end() ? lastUsedRegion->used : heapStats.bwrStats.used,
+                lastUsedRegion != heapStats.regionsStats.end() ? lastUsedRegion->used : heapStats.bwrStats.used,
                 heapEntry
             );
             continue;
@@ -375,7 +375,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
         if (heapEntry.wFlags == 0)
         {
             UpdateBlocksStats(
-                lastUsedRegion != heapStats.regions.end() ? lastUsedRegion->free : heapStats.bwrStats.free,
+                lastUsedRegion != heapStats.regionsStats.end() ? lastUsedRegion->free : heapStats.bwrStats.free,
                 heapEntry
             );
             continue;
@@ -619,7 +619,7 @@ void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const 
 
 void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
 {
-    for (const auto& reg : heapStats.regions)
+    for (const auto& reg : heapStats.regionsStats)
     {
         heapStats.regionsSummary.numberOfRegions++;
         heapStats.regionsSummary.size += reg.regionSize;
@@ -663,17 +663,17 @@ void HeapAnalyzer::MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats
 
 bool HeapAnalyzer::RegionExists(const HeapStats& heapStats, const PROCESS_HEAP_ENTRY& entry)
 {
-    return std::find_if(heapStats.regions.begin(), heapStats.regions.end(),
+    return std::find_if(heapStats.regionsStats.begin(), heapStats.regionsStats.end(),
         [&](const HeapStats::RegionStats& reg) -> bool
         {
             return reg.regionStart == reinterpret_cast<size_t>(entry.Region.lpFirstBlock) ||
                 reg.regionEnd == reinterpret_cast<size_t>(entry.Region.lpLastBlock);
-        }) != heapStats.regions.end();
+        }) != heapStats.regionsStats.end();
 }
 
-bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, HeapStats::Regions::iterator region, const PROCESS_HEAP_ENTRY& heapEntry)
+bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, HeapStats::RegionsStats::iterator region, const PROCESS_HEAP_ENTRY& heapEntry)
 {
-    if (region == heapStats.regions.end())
+    if (region == heapStats.regionsStats.end())
         return false;
 
     size_t address = reinterpret_cast<size_t>(heapEntry.lpData);
@@ -683,10 +683,10 @@ bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, HeapStats::Regions::it
     return false;
 }
 
-HeapStats::Regions::iterator HeapAnalyzer::GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry)
+HeapStats::RegionsStats::iterator HeapAnalyzer::GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry)
 {
     auto address = reinterpret_cast<size_t>(heapEntry.lpData);
-    return std::find_if(heapStats.regions.begin(), heapStats.regions.end(),
+    return std::find_if(heapStats.regionsStats.begin(), heapStats.regionsStats.end(),
         [&](const HeapStats::RegionStats& region) -> bool
         {
             return address >= region.regionStart && address <= region.regionEnd;

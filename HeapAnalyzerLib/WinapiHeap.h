@@ -91,14 +91,14 @@ struct HeapStats
         WH_string ToString(size_t identation, const char* separator) const;
     };
 
-    using Regions = WH_vector<RegionStats>;
+    using RegionsStats = WH_vector<RegionStats>;
 
     PVOID heapAddress = NULL;
     ULONG heapInfo = 0;
     RegionsSummary regionsSummary;
     UncommittedRangeStats uncommittedRangeStats;
     BlocksWithoutRegionStats bwrStats;
-    Regions regions;
+    RegionsStats regionsStats;
 
     WH_string ToString(bool includeRegions = false, const char* separator = "\n") const;
 };
@@ -114,8 +114,6 @@ public:
     bool GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats);
     bool GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps, HeapsStats& heapsStats);
 
-    void GenerateAdditionalHeapStats(HeapStats& heapStats);
-
 private:
     WH_string HeapFlagsToString(WORD flags);
     WH_string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
@@ -125,8 +123,8 @@ private:
     void MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src);
 
     bool RegionExists(const HeapStats& heapStats, const PROCESS_HEAP_ENTRY& entry);
-    bool IsInRegion(const HeapStats& heapStats, HeapStats::Regions::iterator region, const PROCESS_HEAP_ENTRY& heapEntry);
-    HeapStats::Regions::iterator GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry);
+    bool IsInRegion(const HeapStats& heapStats, HeapStats::RegionsStats::iterator region, const PROCESS_HEAP_ENTRY& heapEntry);
+    HeapStats::RegionsStats::iterator GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry);
 
     bool IsLockableHeap(HANDLE hHeap);
 };
