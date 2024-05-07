@@ -27,7 +27,7 @@ void Logger::Init()
     if (m_hFile == INVALID_HANDLE_VALUE)
         return;
 
-    m_pStrings->m_pid = to_wh_string(GetProcessId(GetCurrentProcess()));
+    m_pStrings->m_pid = ToWHString(GetProcessId(GetCurrentProcess()));
     AddPaddingToString(m_pStrings->m_pid, kPidSize);
 
     SetProcessName();

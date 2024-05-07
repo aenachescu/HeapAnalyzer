@@ -1,21 +1,40 @@
 #pragma once
 
 #include "Allocator.h"
+#include "MinMax.h"
 
-#include <type_traits>
-
-template<typename T, std::enable_if_t<std::is_integral<T>::value&& std::is_unsigned<T>::value, bool> = true>
-static WH_string to_wh_string(T val)
+inline WH_string NormalizeFieldName(const char* fieldName, size_t maxFieldName)
 {
-    char buff[64] = { '\0' };
-    char* buffEnd = std::end(buff);
-    char* revIt = buffEnd;
+    WH_string result = fieldName;
+    result.append(maxFieldName - result.size(), ' ');
+    result += " : ";
 
-    do {
-        --revIt;
-        *revIt = static_cast<char>('0' + val % 10);
-        val /= 10;
-    } while (val != 0);
+    return result;
+}
 
-    return WH_string(revIt, buffEnd);
+template<typename T>
+concept MinMaxConcept = requires(T a)
+{
+    a.getValue();
+    a.getCounter();
+};
+
+template<typename T>
+inline WH_string ToWHString(const T& val)
+{
+    WH_ostringstream ss;
+    ss << val;
+    return ss.str();
+}
+
+template<MinMaxConcept T>
+WH_string ToWHString(T& val, const WH_string& text, size_t identation = 0, const char* counterText = " Count: ")
+{
+    WH_string result(identation, ' ');
+    result += text;
+    result += val.getCounter() > 0 ? ToWHString(val.getValue()) : "NaN";
+    result += counterText;
+    result += ToWHString(val.getCounter());
+
+    return result;
 }
