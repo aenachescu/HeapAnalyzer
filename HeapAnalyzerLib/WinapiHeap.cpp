@@ -57,16 +57,16 @@ WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identat
     identationStr = WH_string(identation, ' ');
 
     result += identationStr + NormalizeFieldName("NumberOfBlocks", kMaxFieldName) + ToWHString(numberOfBlocks) + separator;
-    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize) + separator;
-    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead) + separator;
-    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead, true) + separator;
 
-    result += ToWHString(minBlockSize, NormalizeFieldName("MinBlockSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxBlockSize, NormalizeFieldName("MaxBlockSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(minBlockOverhead, NormalizeFieldName("MinBlockOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxBlockOverhead, NormalizeFieldName("MaxBlockOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(minBlockSizeWithOverhead, NormalizeFieldName("MinBlockSizeWithOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxBlockSizeWithOverhead, NormalizeFieldName("MaxBlockSizeWithOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(minBlockSize, true, NormalizeFieldName("MinBlockSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxBlockSize, true, NormalizeFieldName("MaxBlockSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(minBlockOverhead, true, NormalizeFieldName("MinBlockOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxBlockOverhead, true, NormalizeFieldName("MaxBlockOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(minBlockSizeWithOverhead, true, NormalizeFieldName("MinBlockSizeWithOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxBlockSizeWithOverhead, true, NormalizeFieldName("MaxBlockSizeWithOverhead", kMaxFieldName), identation) + separator;
 
     return result;
 }
@@ -89,10 +89,10 @@ WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separa
         ToWHString(reinterpret_cast<void*>(regionStart)) + separator;
     result += identationStr + NormalizeFieldName("End", kMaxFieldName) +
         ToWHString(reinterpret_cast<void*>(regionEnd)) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + ToWHString(regionSize) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + ToWHString(regionOverhead) + separator;
-    result += identationStr + NormalizeFieldName("CommittedSize", kMaxFieldName) + ToWHString(regionCommittedSize) + separator;
-    result += identationStr + NormalizeFieldName("UncommittedSize", kMaxFieldName) + ToWHString(regionUncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + ToWHString(regionSize, true) + separator;
+    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + ToWHString(regionOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("CommittedSize", kMaxFieldName) + ToWHString(regionCommittedSize, true) + separator;
+    result += identationStr + NormalizeFieldName("UncommittedSize", kMaxFieldName) + ToWHString(regionUncommittedSize, true) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -124,20 +124,20 @@ WH_string HeapStats::RegionsSummary::ToString(size_t identation, const char* sep
     WH_string identationStr = WH_string(identation, ' ');
 
     result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + ToWHString(numberOfRegions) + separator;
-    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize) + separator;
-    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead) + separator;
-    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead) + separator;
-    result += identationStr + NormalizeFieldName("TotalCommittedSize", kMaxFieldName) + ToWHString(totalCommittedSize) + separator;
-    result += identationStr + NormalizeFieldName("TotalUncommittedSize", kMaxFieldName) + ToWHString(totalUncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalCommittedSize", kMaxFieldName) + ToWHString(totalCommittedSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalUncommittedSize", kMaxFieldName) + ToWHString(totalUncommittedSize, true) + separator;
 
-    result += ToWHString(minRegionSize, NormalizeFieldName("MinRegionSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionSize, NormalizeFieldName("MaxRegionSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(minRegionOverhead, NormalizeFieldName("MinRegionOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionOverhead, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(minRegionCommittedSize, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionCommittedSize, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(minRegionUncommittedSize, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionUncommittedSize, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRegionSize, true, NormalizeFieldName("MinRegionSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionSize, true, NormalizeFieldName("MaxRegionSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRegionOverhead, true, NormalizeFieldName("MinRegionOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionOverhead, true, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRegionCommittedSize, true, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionCommittedSize, true, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRegionUncommittedSize, true, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionUncommittedSize, true, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName), identation) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -176,16 +176,16 @@ WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const ch
     WH_string identationStr = WH_string(identation, ' ');
 
     result += identationStr + NormalizeFieldName("NumberOfRanges", kMaxFieldName) + ToWHString(numberOfRanges) + separator;
-    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize) + separator;
-    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead) + separator;
-    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSize + totalOverhead, true) + separator;
 
-    result += ToWHString(minRangeSize, NormalizeFieldName("MinRangeSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRangeSize, NormalizeFieldName("MaxRangeSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(minRangeOverhead, NormalizeFieldName("MinRangeOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRangeOverhead, NormalizeFieldName("MaxRangeOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(minRangeSizeWithOverhead, NormalizeFieldName("MinRangeSizeWithOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRangeSizeWithOverhead, NormalizeFieldName("MaxRangeSizeWithOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRangeSize, true, NormalizeFieldName("MinRangeSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRangeSize, true, NormalizeFieldName("MaxRangeSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRangeOverhead, true, NormalizeFieldName("MinRangeOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRangeOverhead, true, NormalizeFieldName("MaxRangeOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(minRangeSizeWithOverhead, true, NormalizeFieldName("MinRangeSizeWithOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRangeSizeWithOverhead, true, NormalizeFieldName("MaxRangeSizeWithOverhead", kMaxFieldName), identation) + separator;
 
     return result;
 }
