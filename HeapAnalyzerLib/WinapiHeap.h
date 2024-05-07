@@ -118,7 +118,7 @@ public:
     HeapAnalyzer() = default;
     ~HeapAnalyzer() = default;
 
-    bool GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats);
+    bool GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats, bool generateAdditionalStats = true);
     bool GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps, HeapsStats& heapsStats);
 
 private:
@@ -126,6 +126,8 @@ private:
     WH_string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
 
     void UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry);
+
+    void GenerateAdditionalHeapStats(HeapStats& heapStats);
     void GenerateRegionsSummary(HeapStats& heapStats);
     void MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src);
 

@@ -271,7 +271,7 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
     return result;
 }
 
-bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats)
+bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats, bool generateAdditionalStats)
 {
     extern Settings g_settings;
 
@@ -438,8 +438,6 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
         }
     }
 
-    GenerateRegionsSummary(heapStats);
-
 end:
 
     if (bIsLocked == false)
@@ -453,7 +451,14 @@ end:
     }
 
     if (bRes == true)
+    {
         g_logger.LogInfo("GetHeapStatistics succeeded");
+
+        if (generateAdditionalStats == true)
+        {
+            GenerateAdditionalHeapStats(heapStats);
+        }
+    }
 
     return bRes;
 }
@@ -564,7 +569,7 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
         {
             HeapStats stats;
 
-            if (GetHeapStatistics(h, true, stats) == false)
+            if (GetHeapStatistics(h, true, stats, false) == false)
             {
                 g_logger.LogError("failed to get statistics for heap: {}", h);
                 bRes = false; // return false if we couldn't get statistics for a heap
@@ -577,6 +582,11 @@ bool HeapAnalyzer::GetHeapsStatistics(std::initializer_list<HANDLE> ignoredHeaps
 
             if (HeapUnlock(h) == FALSE)
                 g_logger.LogError("failed to unlock heap {}: {}", h, GetLastError());
+        }
+
+        for (auto& h : heapsStats)
+        {
+            GenerateAdditionalHeapStats(h);
         }
     } while (false);
 
@@ -657,6 +667,11 @@ void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const 
 
     blocksStats.minBlockSizeWithOverhead = blockSizeWithOverhead;
     blocksStats.maxBlockSizeWithOverhead = blockSizeWithOverhead;
+}
+
+void HeapAnalyzer::GenerateAdditionalHeapStats(HeapStats& heapStats)
+{
+    GenerateRegionsSummary(heapStats);
 }
 
 void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
