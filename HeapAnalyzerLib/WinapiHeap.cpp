@@ -724,11 +724,16 @@ void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
         MergeBlocksStats(heapStats.regionsSummary.used, reg.used);
         MergeBlocksStats(heapStats.regionsSummary.free, reg.free);
     }
+
+    ProcessStats(heapStats.regionsSummary.total);
+    ProcessStats(heapStats.regionsSummary.used);
+    ProcessStats(heapStats.regionsSummary.free);
 }
 
 void HeapAnalyzer::MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src)
 {
     dst.numberOfBlocks += src.numberOfBlocks;
+
     dst.totalSize += src.totalSize;
     dst.totalOverhead += src.totalOverhead;
 
