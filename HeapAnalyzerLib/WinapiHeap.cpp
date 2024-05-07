@@ -71,9 +71,16 @@ static WH_string PointerToString(void* ptr)
 WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
-        sizeof("Num"), sizeof("Size"), sizeof("Overhead"),
-        sizeof("Shortest"), sizeof("Longest"), sizeof("ShortestOh"),
-        sizeof("LongestOh"), sizeof("ShortestBnO"), sizeof("LongestBnO"),
+        sizeof("NumberOfBlocks"),
+        sizeof("TotalSize"),
+        sizeof("TotalOverhead"),
+        sizeof("TotalSizeAndOverhead"),
+        sizeof("MinBlockSize"),
+        sizeof("MaxBlockSize"),
+        sizeof("MinBlockOverhead"),
+        sizeof("MaxBlockOverhead"),
+        sizeof("MinBlockSizeWithOverhead"),
+        sizeof("MaxBlockSizeWithOverhead"),
     }) - 1;
 
     WH_string result;
@@ -84,16 +91,17 @@ WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identat
     identation += 4;
     identationStr = WH_string(identation, ' ');
 
-    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + to_wh_string(num) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(size) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(overhead) + separator;
+    result += identationStr + NormalizeFieldName("NumberOfBlocks", kMaxFieldName) + to_wh_string(numberOfBlocks) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + to_wh_string(totalSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + to_wh_string(totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + to_wh_string(totalSize + totalOverhead) + separator;
 
-    result += MinMaxToString(shortestBlock, NormalizeFieldName("Shortest", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestBlock, NormalizeFieldName("Longest", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestOverhead, NormalizeFieldName("ShortestOh", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestOverhead, NormalizeFieldName("LongestOh", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestBlockWithOverhead, NormalizeFieldName("ShortestBnO", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestBlockWithOverhead, NormalizeFieldName("LongestBnO", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minBlockSize, NormalizeFieldName("MinBlockSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxBlockSize, NormalizeFieldName("MaxBlockSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minBlockOverhead, NormalizeFieldName("MinBlockOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxBlockOverhead, NormalizeFieldName("MaxBlockOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minBlockSizeWithOverhead, NormalizeFieldName("MinBlockSizeWithOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxBlockSizeWithOverhead, NormalizeFieldName("MaxBlockSizeWithOverhead", kMaxFieldName).c_str(), identation) + separator;
 
     return result;
 }
@@ -101,8 +109,12 @@ WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identat
 WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
-        sizeof("Start"), sizeof("End"), sizeof("Size"),
-        sizeof("Overhead"), sizeof("Committed"), sizeof("Uncommitted"),
+        sizeof("Start"),
+        sizeof("End"),
+        sizeof("Size"),
+        sizeof("Overhead"),
+        sizeof("CommittedSize"),
+        sizeof("UncommittedSize"),
     }) - 1;
 
     WH_string result;
@@ -114,8 +126,8 @@ WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separa
         PointerToString(reinterpret_cast<void*>(regionEnd)) + separator;
     result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(regionSize) + separator;
     result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(regionOverhead) + separator;
-    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + to_wh_string(regionCommittedSize) + separator;
-    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + to_wh_string(regionUncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("CommittedSize", kMaxFieldName) + to_wh_string(regionCommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("UncommittedSize", kMaxFieldName) + to_wh_string(regionUncommittedSize) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -127,28 +139,40 @@ WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separa
 WH_string HeapStats::RegionsSummary::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
-        sizeof("NumberOfRegions"), sizeof("Size"), sizeof("Overhead"), sizeof("Committed"), sizeof("Uncommitted"),
-        sizeof("LongestSize"), sizeof("ShortestSize"), sizeof("LongestOverhead"), sizeof("ShortestOverhead"),
-        sizeof("LongestCommitted"), sizeof("ShortestCommitted"), sizeof("LongestUncommitted"), sizeof("ShortestUncommitted"),
+        sizeof("NumberOfRegions"),
+        sizeof("TotalSize"),
+        sizeof("TotalOverhead"),
+        sizeof("TotalSizeAndOverhead"),
+        sizeof("TotalCommittedSize"),
+        sizeof("TotalUncommittedSize"),
+        sizeof("MinRegionSize"),
+        sizeof("MaxRegionSize"),
+        sizeof("MinRegionOverhead"),
+        sizeof("MaxRegionOverhead"),
+        sizeof("MinRegionCommittedSize"),
+        sizeof("MaxRegionCommittedSize"),
+        sizeof("MinRegionUncommittedSize"),
+        sizeof("MaxRegionUncommittedSize"),
     }) - 1;
 
     WH_string result;
     WH_string identationStr = WH_string(identation, ' ');
 
     result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + to_wh_string(numberOfRegions) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(size) + separator;
-    result += identationStr + NormalizeFieldName("Overhead", kMaxFieldName) + to_wh_string(overhead) + separator;
-    result += identationStr + NormalizeFieldName("Committed", kMaxFieldName) + to_wh_string(committedSize) + separator;
-    result += identationStr + NormalizeFieldName("Uncommitted", kMaxFieldName) + to_wh_string(uncommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + to_wh_string(totalSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + to_wh_string(totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + to_wh_string(totalSize + totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalCommittedSize", kMaxFieldName) + to_wh_string(totalCommittedSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalUncommittedSize", kMaxFieldName) + to_wh_string(totalUncommittedSize) + separator;
 
-    result += MinMaxToString(longestSize, NormalizeFieldName("LongestSize", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestSize, NormalizeFieldName("ShortestSize", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestOverhead, NormalizeFieldName("LongestOverhead", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestOverhead, NormalizeFieldName("ShortestOverhead", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestCommittedSize, NormalizeFieldName("LongestCommitted", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestCommittedSize, NormalizeFieldName("ShortestCommitted", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestUncommittedSize, NormalizeFieldName("LongestUncommitted", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestUncommittedSize, NormalizeFieldName("ShortestUncommitted", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRegionSize, NormalizeFieldName("MinRegionSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRegionSize, NormalizeFieldName("MaxRegionSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRegionOverhead, NormalizeFieldName("MinRegionOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRegionOverhead, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRegionCommittedSize, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRegionCommittedSize, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRegionUncommittedSize, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRegionUncommittedSize, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName).c_str(), identation) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -171,19 +195,32 @@ WH_string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, const
 WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
-        sizeof("Num"), sizeof("Size"), sizeof("Shortest"),
-        sizeof("Longest"), sizeof("ShortestOverhead"), sizeof("LongestOverhead"),
+        sizeof("NumberOfRanges"),
+        sizeof("TotalSize"),
+        sizeof("TotalOverhead"),
+        sizeof("TotalSizeAndOverhead"),
+        sizeof("MinRangeSize"),
+        sizeof("MaxRangeSize"),
+        sizeof("MinRangeOverhead"),
+        sizeof("MaxRangeOverhead"),
+        sizeof("MinRangeSizeWithOverhead"),
+        sizeof("MaxRangeSizeWithOverhead"),
     }) - 1;
 
     WH_string result;
     WH_string identationStr = WH_string(identation, ' ');
 
-    result += identationStr + NormalizeFieldName("Num", kMaxFieldName) + to_wh_string(numOfRanges) + separator;
-    result += identationStr + NormalizeFieldName("Size", kMaxFieldName) + to_wh_string(totalSize) + separator;
-    result += MinMaxToString(shortestRange, NormalizeFieldName("Shortest", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestRange, NormalizeFieldName("Longest", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(shortestOverhead, NormalizeFieldName("ShortestOverhead", kMaxFieldName).c_str(), identation) + separator;
-    result += MinMaxToString(longestOverhead, NormalizeFieldName("LongestOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += identationStr + NormalizeFieldName("NumberOfRanges", kMaxFieldName) + to_wh_string(numberOfRanges) + separator;
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + to_wh_string(totalSize) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + to_wh_string(totalOverhead) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + to_wh_string(totalSize + totalOverhead) + separator;
+
+    result += MinMaxToString(minRangeSize, NormalizeFieldName("MinRangeSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRangeSize, NormalizeFieldName("MaxRangeSize", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRangeOverhead, NormalizeFieldName("MinRangeOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRangeOverhead, NormalizeFieldName("MaxRangeOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(minRangeSizeWithOverhead, NormalizeFieldName("MinRangeSizeWithOverhead", kMaxFieldName).c_str(), identation) + separator;
+    result += MinMaxToString(maxRangeSizeWithOverhead, NormalizeFieldName("MaxRangeSizeWithOverhead", kMaxFieldName).c_str(), identation) + separator;
 
     return result;
 }
@@ -204,7 +241,7 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
     result += separator;
     result += uncommittedRangeStats.ToString(4, separator);
 
-    if (bwrStats.total.num == 0)
+    if (bwrStats.total.numberOfBlocks == 0)
     {
         result += "Blocks without regions: empty";
         result += separator;
@@ -294,14 +331,19 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
 
         if (heapEntry.wFlags == PROCESS_HEAP_UNCOMMITTED_RANGE)
         {
-            heapStats.uncommittedRangeStats.numOfRanges += 1;
+            size_t rangeSizeWithOverhead = static_cast<size_t>(heapEntry.cbData) + heapEntry.cbOverhead;
+
+            heapStats.uncommittedRangeStats.numberOfRanges += 1;
             heapStats.uncommittedRangeStats.totalSize += heapEntry.cbData;
 
-            heapStats.uncommittedRangeStats.shortestRange = heapEntry.cbData;
-            heapStats.uncommittedRangeStats.longestRange = heapEntry.cbData;
+            heapStats.uncommittedRangeStats.minRangeSize = heapEntry.cbData;
+            heapStats.uncommittedRangeStats.maxRangeSize = heapEntry.cbData;
 
-            heapStats.uncommittedRangeStats.shortestOverhead = heapEntry.cbOverhead;
-            heapStats.uncommittedRangeStats.longestOverhead = heapEntry.cbOverhead;
+            heapStats.uncommittedRangeStats.minRangeOverhead = heapEntry.cbOverhead;
+            heapStats.uncommittedRangeStats.maxRangeOverhead = heapEntry.cbOverhead;
+
+            heapStats.uncommittedRangeStats.minRangeSizeWithOverhead = rangeSizeWithOverhead;
+            heapStats.uncommittedRangeStats.maxRangeSizeWithOverhead = rangeSizeWithOverhead;
 
             continue;
         }
@@ -603,18 +645,18 @@ void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const 
 {
     size_t blockSizeWithOverhead = static_cast<size_t>(heapEntry.cbData) + heapEntry.cbOverhead;
 
-    blocksStats.num += 1;
-    blocksStats.size += heapEntry.cbData;
-    blocksStats.overhead += heapEntry.cbOverhead;
+    blocksStats.numberOfBlocks += 1;
+    blocksStats.totalSize += heapEntry.cbData;
+    blocksStats.totalOverhead += heapEntry.cbOverhead;
 
-    blocksStats.shortestBlock = heapEntry.cbData;
-    blocksStats.longestBlock = heapEntry.cbData;
+    blocksStats.minBlockSize = heapEntry.cbData;
+    blocksStats.maxBlockSize = heapEntry.cbData;
 
-    blocksStats.shortestOverhead = heapEntry.cbOverhead;
-    blocksStats.longestOverhead = heapEntry.cbOverhead;
+    blocksStats.minBlockOverhead = heapEntry.cbOverhead;
+    blocksStats.maxBlockOverhead = heapEntry.cbOverhead;
 
-    blocksStats.shortestBlockWithOverhead = blockSizeWithOverhead;
-    blocksStats.longestBlockWithOverhead = blockSizeWithOverhead;
+    blocksStats.minBlockSizeWithOverhead = blockSizeWithOverhead;
+    blocksStats.maxBlockSizeWithOverhead = blockSizeWithOverhead;
 }
 
 void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
@@ -622,22 +664,22 @@ void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
     for (const auto& reg : heapStats.regionsStats)
     {
         heapStats.regionsSummary.numberOfRegions++;
-        heapStats.regionsSummary.size += reg.regionSize;
-        heapStats.regionsSummary.overhead += reg.regionOverhead;
-        heapStats.regionsSummary.committedSize += reg.regionCommittedSize;
-        heapStats.regionsSummary.uncommittedSize += reg.regionUncommittedSize;
+        heapStats.regionsSummary.totalSize += reg.regionSize;
+        heapStats.regionsSummary.totalOverhead += reg.regionOverhead;
+        heapStats.regionsSummary.totalCommittedSize += reg.regionCommittedSize;
+        heapStats.regionsSummary.totalUncommittedSize += reg.regionUncommittedSize;
 
-        heapStats.regionsSummary.longestSize = reg.regionSize;
-        heapStats.regionsSummary.shortestSize = reg.regionSize;
+        heapStats.regionsSummary.minRegionSize = reg.regionSize;
+        heapStats.regionsSummary.maxRegionSize = reg.regionSize;
 
-        heapStats.regionsSummary.longestOverhead = reg.regionOverhead;
-        heapStats.regionsSummary.shortestOverhead = reg.regionOverhead;
+        heapStats.regionsSummary.minRegionOverhead = reg.regionOverhead;
+        heapStats.regionsSummary.maxRegionOverhead = reg.regionOverhead;
 
-        heapStats.regionsSummary.longestCommittedSize = reg.regionCommittedSize;
-        heapStats.regionsSummary.shortestCommittedSize = reg.regionCommittedSize;
+        heapStats.regionsSummary.minRegionCommittedSize = reg.regionCommittedSize;
+        heapStats.regionsSummary.maxRegionCommittedSize = reg.regionCommittedSize;
 
-        heapStats.regionsSummary.longestUncommittedSize = reg.regionUncommittedSize;
-        heapStats.regionsSummary.shortestUncommittedSize = reg.regionUncommittedSize;
+        heapStats.regionsSummary.minRegionUncommittedSize = reg.regionUncommittedSize;
+        heapStats.regionsSummary.maxRegionUncommittedSize = reg.regionUncommittedSize;
 
         MergeBlocksStats(heapStats.regionsSummary.total, reg.total);
         MergeBlocksStats(heapStats.regionsSummary.used, reg.used);
@@ -647,18 +689,18 @@ void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
 
 void HeapAnalyzer::MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src)
 {
-    dst.num += src.num;
-    dst.size += src.size;
-    dst.overhead += src.overhead;
+    dst.numberOfBlocks += src.numberOfBlocks;
+    dst.totalSize += src.totalSize;
+    dst.totalOverhead += src.totalOverhead;
 
-    dst.shortestBlock = src.shortestBlock;
-    dst.longestBlock = src.longestBlock;
+    dst.minBlockSize = src.minBlockSize;
+    dst.maxBlockSize = src.maxBlockSize;
 
-    dst.shortestOverhead = src.shortestOverhead;
-    dst.longestOverhead = src.longestOverhead;
+    dst.minBlockOverhead = src.minBlockOverhead;
+    dst.maxBlockOverhead = src.maxBlockOverhead;
 
-    dst.shortestBlockWithOverhead = src.shortestBlockWithOverhead;
-    dst.longestBlockWithOverhead = src.longestBlockWithOverhead;
+    dst.minBlockSizeWithOverhead = src.minBlockSizeWithOverhead;
+    dst.maxBlockSizeWithOverhead = src.maxBlockSizeWithOverhead;
 }
 
 bool HeapAnalyzer::RegionExists(const HeapStats& heapStats, const PROCESS_HEAP_ENTRY& entry)

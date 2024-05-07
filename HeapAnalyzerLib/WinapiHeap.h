@@ -12,18 +12,18 @@ struct HeapStats
 {
     struct BlocksStats
     {
-        size_t num = 0;
-        size_t size = 0;
-        size_t overhead = 0;
+        size_t numberOfBlocks = 0;
+        size_t totalSize = 0;
+        size_t totalOverhead = 0;
 
-        MinValueAndCount<> shortestBlock;
-        MaxValueAndCount<> longestBlock;
+        MinValueAndCount<> minBlockSize;
+        MaxValueAndCount<> maxBlockSize;
 
-        MinValueAndCount<> shortestOverhead;
-        MaxValueAndCount<> longestOverhead;
+        MinValueAndCount<> minBlockOverhead;
+        MaxValueAndCount<> maxBlockOverhead;
 
-        MinValueAndCount<> shortestBlockWithOverhead;
-        MaxValueAndCount<> longestBlockWithOverhead;
+        MinValueAndCount<> minBlockSizeWithOverhead;
+        MaxValueAndCount<> maxBlockSizeWithOverhead;
 
         WH_string ToString(const char* blockName, size_t identation, const char* separator) const;
     };
@@ -47,19 +47,22 @@ struct HeapStats
     struct RegionsSummary
     {
         size_t numberOfRegions = 0;
-        size_t size = 0;
-        size_t overhead = 0;
-        size_t committedSize = 0;
-        size_t uncommittedSize = 0;
+        size_t totalSize = 0;
+        size_t totalOverhead = 0;
+        size_t totalCommittedSize = 0;
+        size_t totalUncommittedSize = 0;
 
-        MaxValueAndCount<> longestSize;
-        MinValueAndCount<> shortestSize;
-        MaxValueAndCount<> longestOverhead;
-        MinValueAndCount<> shortestOverhead;
-        MaxValueAndCount<> longestCommittedSize;
-        MinValueAndCount<> shortestCommittedSize;
-        MaxValueAndCount<> longestUncommittedSize;
-        MinValueAndCount<> shortestUncommittedSize;
+        MinValueAndCount<> minRegionSize;
+        MaxValueAndCount<> maxRegionSize;
+
+        MinValueAndCount<> minRegionOverhead;
+        MaxValueAndCount<> maxRegionOverhead;
+
+        MinValueAndCount<> minRegionCommittedSize;
+        MaxValueAndCount<> maxRegionCommittedSize;
+
+        MinValueAndCount<> minRegionUncommittedSize;
+        MaxValueAndCount<> maxRegionUncommittedSize;
 
         BlocksStats total;
         BlocksStats used;
@@ -79,14 +82,18 @@ struct HeapStats
 
     struct UncommittedRangeStats
     {
-        size_t numOfRanges = 0;
+        size_t numberOfRanges = 0;
         size_t totalSize = 0;
+        size_t totalOverhead = 0;
 
-        MinValueAndCount<> shortestRange;
-        MaxValueAndCount<> longestRange;
+        MinValueAndCount<> minRangeSize;
+        MaxValueAndCount<> maxRangeSize;
 
-        MinValueAndCount<> shortestOverhead;
-        MaxValueAndCount<> longestOverhead;
+        MinValueAndCount<> minRangeOverhead;
+        MaxValueAndCount<> maxRangeOverhead;
+
+        MinValueAndCount<> minRangeSizeWithOverhead;
+        MaxValueAndCount<> maxRangeSizeWithOverhead;
 
         WH_string ToString(size_t identation, const char* separator) const;
     };
