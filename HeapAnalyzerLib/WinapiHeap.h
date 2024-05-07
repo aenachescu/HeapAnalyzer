@@ -13,8 +13,10 @@ struct HeapStats
     struct BlocksStats
     {
         size_t numberOfBlocks = 0;
+
         size_t totalSize = 0;
         size_t totalOverhead = 0;
+        size_t totalSizeAndOverhead = 0;
 
         MinValueAndCount<> minBlockSize;
         MaxValueAndCount<> maxBlockSize;
@@ -32,10 +34,14 @@ struct HeapStats
     {
         size_t regionStart = 0;
         size_t regionEnd = 0;
+
         size_t regionSize = 0;
         size_t regionOverhead = 0;
+        size_t regionSizeAndOverhead = 0;
+
         size_t regionCommittedSize = 0;
         size_t regionUncommittedSize = 0;
+        size_t regionCommittedAndUncommittedSize = 0;
 
         BlocksStats total;
         BlocksStats used;
@@ -47,10 +53,14 @@ struct HeapStats
     struct RegionsSummary
     {
         size_t numberOfRegions = 0;
+
         size_t totalSize = 0;
         size_t totalOverhead = 0;
+        size_t totalSizeAndOverhead = 0;
+
         size_t totalCommittedSize = 0;
         size_t totalUncommittedSize = 0;
+        size_t totalCommittedAndUncommittedSize = 0;
 
         MinValueAndCount<> minRegionSize;
         MaxValueAndCount<> maxRegionSize;
@@ -83,8 +93,10 @@ struct HeapStats
     struct UncommittedRangeStats
     {
         size_t numberOfRanges = 0;
+
         size_t totalSize = 0;
         size_t totalOverhead = 0;
+        size_t totalSizeAndOverhead = 0;
 
         MinValueAndCount<> minRangeSize;
         MaxValueAndCount<> maxRangeSize;
@@ -102,10 +114,10 @@ struct HeapStats
 
     PVOID heapAddress = NULL;
     ULONG heapInfo = 0;
-    RegionsSummary regionsSummary;
-    UncommittedRangeStats uncommittedRangeStats;
-    BlocksWithoutRegionStats bwrStats;
     RegionsStats regionsStats;
+    BlocksWithoutRegionStats bwrStats;
+    UncommittedRangeStats uncommittedRangeStats;
+    RegionsSummary regionsSummary;
 
     WH_string ToString(bool includeRegions = false, const char* separator = "\n") const;
 };
@@ -126,6 +138,11 @@ private:
     WH_string HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry);
 
     void UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry);
+
+    void ProcessStats(HeapStats::BlocksStats& blockStats);
+    void ProcessStats(HeapStats::RegionStats& regionStats);
+    void ProcessStats(HeapStats::BlocksWithoutRegionStats& bwrStats);
+    void ProcessStats(HeapStats::UncommittedRangeStats& rangeStats);
 
     void GenerateAdditionalHeapStats(HeapStats& heapStats);
     void GenerateRegionsSummary(HeapStats& heapStats);
