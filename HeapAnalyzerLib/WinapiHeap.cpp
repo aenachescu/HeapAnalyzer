@@ -33,7 +33,7 @@ static WH_string HeapInfoToStr(ULONG info)
     return ToWHString(info);
 }
 
-WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identation, const char* separator) const
+WH_string BlocksStats::ToString(const char* blockName, size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("NumberOfBlocks"),
@@ -74,7 +74,7 @@ WH_string HeapStats::BlocksStats::ToString(const char* blockName, size_t identat
     return result;
 }
 
-WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separator) const
+WH_string RegionStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("Start"),
@@ -110,60 +110,7 @@ WH_string HeapStats::RegionStats::ToString(size_t identation, const char* separa
     return result;
 }
 
-WH_string HeapStats::RegionsSummary::ToString(size_t identation, const char* separator) const
-{
-    static constexpr size_t kMaxFieldName = std::max({
-        sizeof("NumberOfRegions"),
-        sizeof("TotalSize"),
-        sizeof("TotalOverhead"),
-        sizeof("TotalSizeAndOverhead"),
-        sizeof("TotalCommittedSize"),
-        sizeof("TotalUncommittedSize"),
-        sizeof("TotalCommittedAndUncommittedSize"),
-        sizeof("MinRegionSize"),
-        sizeof("MaxRegionSize"),
-        sizeof("MinRegionOverhead"),
-        sizeof("MaxRegionOverhead"),
-        sizeof("MinRegionCommittedSize"),
-        sizeof("MaxRegionCommittedSize"),
-        sizeof("MinRegionUncommittedSize"),
-        sizeof("MaxRegionUncommittedSize"),
-    }) - 1;
-
-    WH_string result;
-    WH_string identationStr = WH_string(identation, ' ');
-
-    result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + ToWHString(numberOfRegions) + separator;
-
-    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize, true) + separator;
-    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead, true) + separator;
-    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSizeAndOverhead, true) + separator;
-
-    result += identationStr + NormalizeFieldName("TotalCommittedSize", kMaxFieldName) + ToWHString(totalCommittedSize, true) + separator;
-    result += identationStr + NormalizeFieldName("TotalUncommittedSize", kMaxFieldName) + ToWHString(totalUncommittedSize, true) + separator;
-    result += identationStr + NormalizeFieldName("TotalCommittedAndUncommittedSize", kMaxFieldName) +
-        ToWHString(totalCommittedAndUncommittedSize, true) + separator;
-
-    result += ToWHString(minRegionSize, true, NormalizeFieldName("MinRegionSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionSize, true, NormalizeFieldName("MaxRegionSize", kMaxFieldName), identation) + separator;
-
-    result += ToWHString(minRegionOverhead, true, NormalizeFieldName("MinRegionOverhead", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionOverhead, true, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName), identation) + separator;
-
-    result += ToWHString(minRegionCommittedSize, true, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionCommittedSize, true, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName), identation) + separator;
-
-    result += ToWHString(minRegionUncommittedSize, true, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName), identation) + separator;
-    result += ToWHString(maxRegionUncommittedSize, true, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName), identation) + separator;
-
-    result += total.ToString("total", identation, separator);
-    result += used.ToString("used", identation, separator);
-    result += free.ToString("free", identation, separator);
-
-    return result;
-}
-
-WH_string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, const char* separator) const
+WH_string BlocksWithoutRegionStats::ToString(size_t identation, const char* separator) const
 {
     WH_string result;
 
@@ -174,7 +121,7 @@ WH_string HeapStats::BlocksWithoutRegionStats::ToString(size_t identation, const
     return result;
 }
 
-WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const char* separator) const
+WH_string UncommittedRangeStats::ToString(size_t identation, const char* separator) const
 {
     static constexpr size_t kMaxFieldName = std::max({
         sizeof("NumberOfRanges"),
@@ -210,6 +157,59 @@ WH_string HeapStats::UncommittedRangeStats::ToString(size_t identation, const ch
     return result;
 }
 
+WH_string RegionsSummary::ToString(size_t identation, const char* separator) const
+{
+    static constexpr size_t kMaxFieldName = std::max({
+        sizeof("NumberOfRegions"),
+        sizeof("TotalSize"),
+        sizeof("TotalOverhead"),
+        sizeof("TotalSizeAndOverhead"),
+        sizeof("TotalCommittedSize"),
+        sizeof("TotalUncommittedSize"),
+        sizeof("TotalCommittedAndUncommittedSize"),
+        sizeof("MinRegionSize"),
+        sizeof("MaxRegionSize"),
+        sizeof("MinRegionOverhead"),
+        sizeof("MaxRegionOverhead"),
+        sizeof("MinRegionCommittedSize"),
+        sizeof("MaxRegionCommittedSize"),
+        sizeof("MinRegionUncommittedSize"),
+        sizeof("MaxRegionUncommittedSize"),
+        }) - 1;
+
+    WH_string result;
+    WH_string identationStr = WH_string(identation, ' ');
+
+    result += identationStr + NormalizeFieldName("NumberOfRegions", kMaxFieldName) + ToWHString(numberOfRegions) + separator;
+
+    result += identationStr + NormalizeFieldName("TotalSize", kMaxFieldName) + ToWHString(totalSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalOverhead", kMaxFieldName) + ToWHString(totalOverhead, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalSizeAndOverhead", kMaxFieldName) + ToWHString(totalSizeAndOverhead, true) + separator;
+
+    result += identationStr + NormalizeFieldName("TotalCommittedSize", kMaxFieldName) + ToWHString(totalCommittedSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalUncommittedSize", kMaxFieldName) + ToWHString(totalUncommittedSize, true) + separator;
+    result += identationStr + NormalizeFieldName("TotalCommittedAndUncommittedSize", kMaxFieldName) +
+        ToWHString(totalCommittedAndUncommittedSize, true) + separator;
+
+    result += ToWHString(minRegionSize, true, NormalizeFieldName("MinRegionSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionSize, true, NormalizeFieldName("MaxRegionSize", kMaxFieldName), identation) + separator;
+
+    result += ToWHString(minRegionOverhead, true, NormalizeFieldName("MinRegionOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionOverhead, true, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName), identation) + separator;
+
+    result += ToWHString(minRegionCommittedSize, true, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionCommittedSize, true, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName), identation) + separator;
+
+    result += ToWHString(minRegionUncommittedSize, true, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionUncommittedSize, true, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName), identation) + separator;
+
+    result += total.ToString("total", identation, separator);
+    result += used.ToString("used", identation, separator);
+    result += free.ToString("free", identation, separator);
+
+    return result;
+}
+
 WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
 {
     WH_string result;
@@ -222,13 +222,9 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
     result += separator;
     result += regionsSummary.ToString(4, separator);
 
-    result += "Uncommitted range stats:";
-    result += separator;
-    result += uncommittedRangeStats.ToString(4, separator);
-
     if (bwrStats.total.numberOfBlocks == 0)
     {
-        result += "Blocks without regions: empty";
+        result += "Blocks without regions: none";
         result += separator;
     }
     else
@@ -237,6 +233,10 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
         result += separator;
         result += bwrStats.ToString(4, separator);
     }
+
+    result += "Uncommitted range stats:";
+    result += separator;
+    result += uncommittedRangeStats.ToString(4, separator);
 
     if (includeRegions == true)
     {
@@ -342,7 +342,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
                 break;
             }
 
-            HeapStats::RegionStats reg;
+            RegionStats reg;
 
             reg.regionStart = reinterpret_cast<size_t>(heapEntry.lpData);
             reg.regionEnd = reinterpret_cast<size_t>(heapEntry.Region.lpLastBlock);
@@ -636,7 +636,7 @@ WH_string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
     return result;
 }
 
-void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry)
+void HeapAnalyzer::UpdateBlocksStats(BlocksStats& blocksStats, const PROCESS_HEAP_ENTRY& heapEntry)
 {
     size_t blockSizeWithOverhead = static_cast<size_t>(heapEntry.cbData) + heapEntry.cbOverhead;
 
@@ -654,12 +654,12 @@ void HeapAnalyzer::UpdateBlocksStats(HeapStats::BlocksStats& blocksStats, const 
     blocksStats.maxBlockSizeWithOverhead = blockSizeWithOverhead;
 }
 
-void HeapAnalyzer::ProcessStats(HeapStats::BlocksStats& blockStats)
+void HeapAnalyzer::ProcessStats(BlocksStats& blockStats)
 {
     blockStats.totalSizeAndOverhead = blockStats.totalSize + blockStats.totalOverhead;
 }
 
-void HeapAnalyzer::ProcessStats(HeapStats::RegionStats& regionStats)
+void HeapAnalyzer::ProcessStats(RegionStats& regionStats)
 {
     regionStats.regionSizeAndOverhead = regionStats.regionSize + regionStats.regionOverhead;
     regionStats.regionCommittedAndUncommittedSize = regionStats.regionCommittedSize + regionStats.regionUncommittedSize;
@@ -669,14 +669,14 @@ void HeapAnalyzer::ProcessStats(HeapStats::RegionStats& regionStats)
     ProcessStats(regionStats.free);
 }
 
-void HeapAnalyzer::ProcessStats(HeapStats::BlocksWithoutRegionStats& bwrStats)
+void HeapAnalyzer::ProcessStats(BlocksWithoutRegionStats& bwrStats)
 {
     ProcessStats(bwrStats.total);
     ProcessStats(bwrStats.used);
     ProcessStats(bwrStats.free);
 }
 
-void HeapAnalyzer::ProcessStats(HeapStats::UncommittedRangeStats& rangeStats)
+void HeapAnalyzer::ProcessStats(UncommittedRangeStats& rangeStats)
 {
     rangeStats.totalSizeAndOverhead = rangeStats.totalSize + rangeStats.totalOverhead;
 }
@@ -730,7 +730,7 @@ void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
     ProcessStats(heapStats.regionsSummary.free);
 }
 
-void HeapAnalyzer::MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats::BlocksStats& src)
+void HeapAnalyzer::MergeBlocksStats(BlocksStats& dst, const BlocksStats& src)
 {
     dst.numberOfBlocks += src.numberOfBlocks;
 
@@ -750,14 +750,14 @@ void HeapAnalyzer::MergeBlocksStats(HeapStats::BlocksStats& dst, const HeapStats
 bool HeapAnalyzer::RegionExists(const HeapStats& heapStats, const PROCESS_HEAP_ENTRY& entry)
 {
     return std::find_if(heapStats.regionsStats.begin(), heapStats.regionsStats.end(),
-        [&](const HeapStats::RegionStats& reg) -> bool
+        [&](const RegionStats& reg) -> bool
         {
             return reg.regionStart == reinterpret_cast<size_t>(entry.Region.lpFirstBlock) ||
                 reg.regionEnd == reinterpret_cast<size_t>(entry.Region.lpLastBlock);
         }) != heapStats.regionsStats.end();
 }
 
-bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, HeapStats::RegionsStats::iterator region, const PROCESS_HEAP_ENTRY& heapEntry)
+bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, RegionsStats::iterator region, const PROCESS_HEAP_ENTRY& heapEntry)
 {
     if (region == heapStats.regionsStats.end())
         return false;
@@ -769,11 +769,11 @@ bool HeapAnalyzer::IsInRegion(const HeapStats& heapStats, HeapStats::RegionsStat
     return false;
 }
 
-HeapStats::RegionsStats::iterator HeapAnalyzer::GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry)
+RegionsStats::iterator HeapAnalyzer::GetRegion(HeapStats& heapStats, const PROCESS_HEAP_ENTRY& heapEntry)
 {
     auto address = reinterpret_cast<size_t>(heapEntry.lpData);
     return std::find_if(heapStats.regionsStats.begin(), heapStats.regionsStats.end(),
-        [&](const HeapStats::RegionStats& region) -> bool
+        [&](const RegionStats& region) -> bool
         {
             return address >= region.regionStart && address <= region.regionEnd;
         });
