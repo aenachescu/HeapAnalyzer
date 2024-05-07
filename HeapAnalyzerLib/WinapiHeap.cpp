@@ -737,7 +737,9 @@ HeapStats::RegionsStats::iterator HeapAnalyzer::GetRegion(HeapStats& heapStats, 
 
 bool HeapAnalyzer::IsLockableHeap(HANDLE hHeap)
 {
-    DWORD flags = *(reinterpret_cast<uint32_t*>(hHeap) + 28);
+    static constexpr size_t kHeapFlagsOffset = 28;
+
+    DWORD flags = *(reinterpret_cast<uint32_t*>(hHeap) + kHeapFlagsOffset);
     return (flags & HEAP_NO_SERIALIZE) == 0;
 }
 
