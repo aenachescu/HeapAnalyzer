@@ -18,12 +18,15 @@ struct BlocksStats
 
     MinValueAndCount<> minBlockSize;
     MaxValueAndCount<> maxBlockSize;
+    size_t avgBlockSize = 0;
 
     MinValueAndCount<> minBlockOverhead;
     MaxValueAndCount<> maxBlockOverhead;
+    size_t avgBlockOverhead = 0;
 
     MinValueAndCount<> minBlockSizeWithOverhead;
     MaxValueAndCount<> maxBlockSizeWithOverhead;
+    size_t avgBlockSizeAndOverhead = 0;
 
     WH_string ToString(const char* blockName, size_t identation, const char* separator) const;
 };
@@ -69,12 +72,15 @@ struct UncommittedRangeStats
 
     MinValueAndCount<> minRangeSize;
     MaxValueAndCount<> maxRangeSize;
+    size_t avgRangeSize = 0;
 
     MinValueAndCount<> minRangeOverhead;
     MaxValueAndCount<> maxRangeOverhead;
+    size_t avgRangeOverhead = 0;
 
     MinValueAndCount<> minRangeSizeWithOverhead;
     MaxValueAndCount<> maxRangeSizeWithOverhead;
+    size_t avgRangeSizeWithOverhead = 0;
 
     WH_string ToString(size_t identation, const char* separator) const;
 };
@@ -93,21 +99,27 @@ struct RegionsSummary
 
     MinValueAndCount<> minRegionSize;
     MaxValueAndCount<> maxRegionSize;
+    size_t avgRegionSize = 0;
 
     MinValueAndCount<> minRegionOverhead;
     MaxValueAndCount<> maxRegionOverhead;
+    size_t avgRegionOverhead = 0;
 
     MinValueAndCount<> minRegionSizeWithOverhead;
     MaxValueAndCount<> maxRegionSizeWithOverhead;
+    size_t avgRegionSizeWithOverhead = 0;
 
     MinValueAndCount<> minRegionCommittedSize;
     MaxValueAndCount<> maxRegionCommittedSize;
+    size_t avgRegionCommittedSize = 0;
 
     MinValueAndCount<> minRegionUncommittedSize;
     MaxValueAndCount<> maxRegionUncommittedSize;
+    size_t avgRegionUncommittedSize = 0;
 
     MinValueAndCount<> minRegionCommittedAndUncommittedSize;
     MaxValueAndCount<> maxRegionCommittedAndUncommittedSize;
+    size_t avgRegionCommittedAndUncommittedSize = 0;
 
     BlocksStats total;
     BlocksStats used;
