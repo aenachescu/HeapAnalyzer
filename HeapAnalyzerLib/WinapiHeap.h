@@ -97,11 +97,17 @@ struct RegionsSummary
     MinValueAndCount<> minRegionOverhead;
     MaxValueAndCount<> maxRegionOverhead;
 
+    MinValueAndCount<> minRegionSizeWithOverhead;
+    MaxValueAndCount<> maxRegionSizeWithOverhead;
+
     MinValueAndCount<> minRegionCommittedSize;
     MaxValueAndCount<> maxRegionCommittedSize;
 
     MinValueAndCount<> minRegionUncommittedSize;
     MaxValueAndCount<> maxRegionUncommittedSize;
+
+    MinValueAndCount<> minRegionCommittedAndUncommittedSize;
+    MaxValueAndCount<> maxRegionCommittedAndUncommittedSize;
 
     BlocksStats total;
     BlocksStats used;

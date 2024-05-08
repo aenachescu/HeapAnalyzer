@@ -171,10 +171,14 @@ WH_string RegionsSummary::ToString(size_t identation, const char* separator) con
         sizeof("MaxRegionSize"),
         sizeof("MinRegionOverhead"),
         sizeof("MaxRegionOverhead"),
+        sizeof("MinRegionSizeWithOverhead"),
+        sizeof("MaxRegionSizeWithOverhead"),
         sizeof("MinRegionCommittedSize"),
         sizeof("MaxRegionCommittedSize"),
         sizeof("MinRegionUncommittedSize"),
         sizeof("MaxRegionUncommittedSize"),
+        sizeof("MinRegionCommittedAndUncommittedSize"),
+        sizeof("MaxRegionCommittedAndUncommittedSize"),
         }) - 1;
 
     WH_string result;
@@ -197,11 +201,17 @@ WH_string RegionsSummary::ToString(size_t identation, const char* separator) con
     result += ToWHString(minRegionOverhead, true, NormalizeFieldName("MinRegionOverhead", kMaxFieldName), identation) + separator;
     result += ToWHString(maxRegionOverhead, true, NormalizeFieldName("MaxRegionOverhead", kMaxFieldName), identation) + separator;
 
+    result += ToWHString(minRegionSizeWithOverhead, true, NormalizeFieldName("MinRegionSizeWithOverhead", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionSizeWithOverhead, true, NormalizeFieldName("MaxRegionSizeWithOverhead", kMaxFieldName), identation) + separator;
+
     result += ToWHString(minRegionCommittedSize, true, NormalizeFieldName("MinRegionCommittedSize", kMaxFieldName), identation) + separator;
     result += ToWHString(maxRegionCommittedSize, true, NormalizeFieldName("MaxRegionCommittedSize", kMaxFieldName), identation) + separator;
 
     result += ToWHString(minRegionUncommittedSize, true, NormalizeFieldName("MinRegionUncommittedSize", kMaxFieldName), identation) + separator;
     result += ToWHString(maxRegionUncommittedSize, true, NormalizeFieldName("MaxRegionUncommittedSize", kMaxFieldName), identation) + separator;
+
+    result += ToWHString(minRegionCommittedAndUncommittedSize, true, NormalizeFieldName("MinRegionCommittedAndUncommittedSize", kMaxFieldName), identation) + separator;
+    result += ToWHString(maxRegionCommittedAndUncommittedSize, true, NormalizeFieldName("MaxRegionCommittedAndUncommittedSize", kMaxFieldName), identation) + separator;
 
     result += total.ToString("total", identation, separator);
     result += used.ToString("used", identation, separator);
@@ -716,11 +726,17 @@ void HeapAnalyzer::GenerateRegionsSummary(HeapStats& heapStats)
         heapStats.regionsSummary.minRegionOverhead = reg.regionOverhead;
         heapStats.regionsSummary.maxRegionOverhead = reg.regionOverhead;
 
+        heapStats.regionsSummary.minRegionSizeWithOverhead = reg.regionSizeAndOverhead;
+        heapStats.regionsSummary.maxRegionSizeWithOverhead = reg.regionSizeAndOverhead;
+
         heapStats.regionsSummary.minRegionCommittedSize = reg.regionCommittedSize;
         heapStats.regionsSummary.maxRegionCommittedSize = reg.regionCommittedSize;
 
         heapStats.regionsSummary.minRegionUncommittedSize = reg.regionUncommittedSize;
         heapStats.regionsSummary.maxRegionUncommittedSize = reg.regionUncommittedSize;
+
+        heapStats.regionsSummary.minRegionCommittedAndUncommittedSize = reg.regionCommittedAndUncommittedSize;
+        heapStats.regionsSummary.maxRegionCommittedAndUncommittedSize = reg.regionCommittedAndUncommittedSize;
 
         MergeBlocksStats(heapStats.regionsSummary.total, reg.total);
         MergeBlocksStats(heapStats.regionsSummary.used, reg.used);
