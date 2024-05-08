@@ -258,6 +258,8 @@ WH_string HeapStats::ToString(bool includeRegions, const char* separator) const
 
 bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& heapStats, bool generateAdditionalStats)
 {
+    static constexpr size_t kDefaultRegionsCapacity = 128;
+
     extern Settings g_settings;
 
     g_logger.LogInfo("GetHeapStatistics: {} {}", hHeap, bIsLocked);
@@ -300,6 +302,7 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
     heapEntry.lpData = NULL;
 
     heapStats.heapAddress = hHeap;
+    heapStats.regionsStats.reserve(kDefaultRegionsCapacity);
 
     bWinRes = HeapQueryInformation(hHeap, HeapCompatibilityInformation, &heapStats.heapInfo, sizeof(heapStats.heapInfo), NULL);
     if (bWinRes == FALSE)
@@ -342,7 +345,10 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
                 break;
             }
 
-            RegionStats reg;
+            heapStats.regionsStats.emplace_back();
+            lastUsedRegion = heapStats.regionsStats.end(); // invalidate iterator
+
+            RegionStats& reg = heapStats.regionsStats.back();
 
             reg.regionStart = reinterpret_cast<size_t>(heapEntry.lpData);
             reg.regionEnd = reinterpret_cast<size_t>(heapEntry.Region.lpLastBlock);
@@ -350,10 +356,6 @@ bool HeapAnalyzer::GetHeapStatistics(HANDLE hHeap, bool bIsLocked, HeapStats& he
             reg.regionOverhead = heapEntry.cbOverhead;
             reg.regionCommittedSize = heapEntry.Region.dwCommittedSize;
             reg.regionUncommittedSize = heapEntry.Region.dwUnCommittedSize;
-
-            heapStats.regionsStats.push_back(std::move(reg));
-
-            lastUsedRegion = heapStats.regionsStats.end();
 
             continue;
         }
