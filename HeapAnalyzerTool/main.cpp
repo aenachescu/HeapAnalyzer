@@ -74,9 +74,6 @@ void AnalyzeHeapsForThisProcess()
     {
         g_logger.LogInfo("heap stats: {}", s->ToString());
     }
-
-    auto s = heapAnalyzer.AnalyzeHeap(g_hTestHeap);
-    g_logger.LogInfo("heap stats: {}", s->ToString());
 }
 
 void AnalyzeHeapsForProcess(DWORD pid)
