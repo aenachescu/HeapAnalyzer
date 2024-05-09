@@ -27,7 +27,7 @@
     <ClInclude Include="Allocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="WinapiHeap.h">
+    <ClInclude Include="HeapAnalyzer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Settings.h">
@@ -62,7 +62,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinapiHeap.cpp">
+    <ClCompile Include="HeapAnalyzer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">

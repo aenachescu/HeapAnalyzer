@@ -2,7 +2,7 @@
 #include "pch.h"
 
 #include "Settings.h"
-#include "WinapiHeap.h"
+#include "HeapAnalyzer.h"
 #include "Logger.h"
 
 #include <Windows.h>

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "WinapiHeap.h"
+#include "HeapAnalyzer.h"
 #include "Logger.h"
 #include "StringUtils.h"
 #include "Settings.h"

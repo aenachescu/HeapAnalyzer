@@ -1,7 +1,7 @@
 #include "Settings.h"
 #include "Logger.h"
 #include "Allocator.h"
-#include "WinapiHeap.h"
+#include "HeapAnalyzer.h"
 
 #include <Windows.h>
 
