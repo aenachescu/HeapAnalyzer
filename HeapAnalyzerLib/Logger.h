@@ -28,18 +28,6 @@ private:
         WH_string m_moduleName = "<unknown>";
         WH_string m_modulePath;
         WH_string m_pid = WH_string("0") + WH_string(kPidSize - 1, ' ');
-
-        struct Deleter
-        {
-            void operator()(Strings* s)
-            {
-                if (s != nullptr)
-                {
-                    WorkingHeapAllocator<Strings> a;
-                    a.deallocate(s, 1);
-                }
-            }
-        };
     };
 
 public:
@@ -75,5 +63,8 @@ private:
 private:
     HANDLE m_hFile = INVALID_HANDLE_VALUE;
     bool m_bIsInitialized = false;
-    std::unique_ptr<Strings, Strings::Deleter> m_pStrings = nullptr;
+    // Logger class is initialized as a global variable so the ctor will be called before main function
+    // the working heap is initialized in main function, so it isn't ready for use when all WH_strings
+    // will be constructed.
+    WH_unique_ptr<Strings> m_pStrings = nullptr;
 };

@@ -16,15 +16,13 @@ DWORD WINAPI AnalyzeHeaps(LPVOID)
 {
     g_logger.LogInfo("analyzing heaps for current process");
 
-    WinapiHeap::HeapsStats heapsStats;
-    WinapiHeap::HeapAnalyzer heapAnalyzer;
-
-    bool bRes = heapAnalyzer.GetHeapsStatistics({ g_hWorkingHeap }, heapsStats);
-    g_logger.LogInfo("collected statistics for {} heaps: {}", heapsStats.size(), bRes);
+    HeapAnalyzer heapAnalyzer;
+    HeapsStatistics heapsStats = heapAnalyzer.AnalyzeHeaps({ g_hWorkingHeap });
+    g_logger.LogInfo("collected statistics for {} heaps", heapsStats.size());
 
     for (auto& s : heapsStats)
     {
-        g_logger.LogInfo("heap stats:\n{}", s.ToString(g_settings.bStatsPerRegionLogging));
+        g_logger.LogInfo("heap stats: {}", s->ToString());
     }
 
     FreeLibraryAndExitThread(g_hDll, 0);

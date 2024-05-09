@@ -9,7 +9,7 @@
 
 void Logger::Init()
 {
-    m_pStrings = std::unique_ptr<Strings, Strings::Deleter>{ WorkingHeapAllocator<Strings>().allocate(1) };
+    m_pStrings = MakeWHUnique<Strings>();
 
     SetModulePathAndName();
 

@@ -165,14 +165,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Allocator.h" />
+    <ClInclude Include="BlocksStatistics.h" />
+    <ClInclude Include="FieldStatistics.h" />
+    <ClInclude Include="HeapStatistics.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MathUtils.h" />
     <ClInclude Include="MinMax.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RegionsSummary.h" />
+    <ClInclude Include="RegionStatistics.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="StandaloneBlocksStatistics.h" />
     <ClInclude Include="StringUtils.h" />
+    <ClInclude Include="UncommittedRangesStatistics.h" />
     <ClInclude Include="WinapiHeap.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="HeapStatistics.cpp" />
     <ClCompile Include="WinapiHeap.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="pch.cpp">
