@@ -62,7 +62,6 @@ struct WorkingHeapDeleter
 };
 
 using WH_string = std::basic_string<char, std::char_traits<char>, WorkingHeapAllocator<char>>;
-using WH_ostringstream = std::basic_ostringstream<char, std::char_traits<char>, WorkingHeapAllocator<char>>;
 
 template<typename T>
 using WH_vector = std::vector<T, WorkingHeapAllocator<T>>;
