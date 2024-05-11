@@ -2,6 +2,7 @@
 
 #include "HeapStatistics.h"
 #include "Logger.h"
+#include "StringUtils.h"
 
 #include <algorithm>
 
@@ -13,7 +14,7 @@ bool HeapStatistics::HandleHeapEntry(const PROCESS_HEAP_ENTRY& entry)
     {
         if (RegionExists(entry.Region.lpFirstBlock, entry.Region.lpLastBlock) == true)
         {
-            g_logger.LogError("Region already exists:\n"); // TODO: log heap entry
+            g_logger.LogError("Region already exists: {}", ::ToString(entry));
             return false;
         }
 
@@ -48,7 +49,7 @@ bool HeapStatistics::HandleHeapEntry(const PROCESS_HEAP_ENTRY& entry)
         return true;
     }
 
-    g_logger.LogError("Unsupported heap entry:\n"); // TODO: log heap entry
+    g_logger.LogError("Unsupported heap entry: {}", ::ToString(entry));
 
     return false;
 }

@@ -27,7 +27,7 @@ void Logger::Init()
     if (m_hFile == INVALID_HANDLE_VALUE)
         return;
 
-    m_pStrings->m_pid = ToWHString(GetProcessId(GetCurrentProcess()));
+    m_pStrings->m_pid = ToString(GetProcessId(GetCurrentProcess()));
     AddPaddingToString(m_pStrings->m_pid, kPidSize);
 
     SetProcessName();
@@ -124,30 +124,17 @@ const char* Logger::LogLevelToString(LogLevel lvl)
 
 void Logger::LogMessage(LogLevel lvl, const WH_string& msg)
 {
-    auto getCurrentThreadId = [&]() -> WH_string
-    {
-        WH_ostringstream ss;
-        ss << std::this_thread::get_id();
-
-        WH_string tidStr = ss.str();
-        AddPaddingToString(tidStr, kTidSize);
-
-        return tidStr;
-    };
-
     if (m_bIsInitialized == false)
         return;
 
-    auto currentTime = std::chrono::system_clock::now();
-
     WH_string logMsg;
-    std::format_to(std::back_inserter(logMsg), "[{}] [{}] [{}] [{}] [{} : {}] - {}\n",
-        currentTime,
+    std::format_to(std::back_inserter(logMsg), "[{}] [{}] [{}] [{}] [{} : {:5}] - {}\n",
+        std::chrono::system_clock::now(),
         LogLevelToString(lvl),
         m_pStrings->m_processName,
         m_pStrings->m_moduleName,
         m_pStrings->m_pid,
-        getCurrentThreadId(),
+        std::this_thread::get_id(),
         msg);
 
     OVERLAPPED overlapped = { 0 };

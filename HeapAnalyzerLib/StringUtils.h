@@ -5,15 +5,6 @@
 
 #include <iomanip>
 
-inline WH_string NormalizeFieldName(const char* fieldName, size_t maxFieldName)
-{
-    WH_string result = fieldName;
-    result.append(maxFieldName - result.size(), ' ');
-    result += " : ";
-
-    return result;
-}
-
 template<typename T>
 concept MinMaxConcept = requires(T a)
 {
@@ -22,7 +13,7 @@ concept MinMaxConcept = requires(T a)
 };
 
 template<typename T>
-inline WH_string ToWHString(const T& val)
+inline WH_string ToString(const T& val)
 {
     WH_ostringstream ss;
     ss << val;
@@ -30,7 +21,7 @@ inline WH_string ToWHString(const T& val)
 }
 
 template<typename T>
-inline WH_string ToWHString(const T& val, bool addMeasurementUnit)
+inline WH_string ToString(const T& val, bool addMeasurementUnit)
 {
     static constexpr size_t kb = 1024;
     static constexpr size_t mb = kb * 1024;
@@ -66,13 +57,13 @@ inline WH_string ToWHString(const T& val, bool addMeasurementUnit)
 }
 
 template<MinMaxConcept T>
-WH_string ToWHString(T& val, bool addMeasurementUnit, const WH_string& text, size_t identation = 0, const char* counterText = " Count: ")
+WH_string ToString(T& val, bool addMeasurementUnit, const char* counterText = " Count: ")
 {
-    WH_string result(identation, ' ');
-    result += text;
-    result += val.getCounter() > 0 ? ToWHString(val.getValue(), addMeasurementUnit) : "NaN";
+    WH_string result = val.getCounter() > 0 ? ToString(val.getValue(), addMeasurementUnit) : "NaN";
     result += counterText;
-    result += ToWHString(val.getCounter());
+    result += ToString(val.getCounter());
 
     return result;
 }
+
+WH_string ToString(const PROCESS_HEAP_ENTRY& heapEntry);

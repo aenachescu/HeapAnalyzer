@@ -18,7 +18,6 @@ private:
     };
 
     static constexpr size_t kPidSize = 5;
-    static constexpr size_t kTidSize = 5;
     static constexpr size_t kProcessNameSize = 25;
     static constexpr size_t kModuleNameSize = 25;
 

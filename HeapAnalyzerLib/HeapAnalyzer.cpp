@@ -175,7 +175,7 @@ bool HeapAnalyzer::AnalyzeHeapImpl(HANDLE hHeap, HeapStatistics& heapStats)
     {
         if (g_settings.bHeapEntryLogging == true)
         {
-            g_logger.LogInfo("Processing heap entry:\n{}", HeapEntryToString(heapEntry));
+            g_logger.LogInfo("Processing heap entry: {}", ToString(heapEntry));
         }
 
         if (g_settings.bSearchStrings == true && heapEntry.wFlags == PROCESS_HEAP_ENTRY_BUSY)
@@ -266,61 +266,6 @@ PHANDLE HeapAnalyzer::GetHeaps(DWORD& numOfHeaps)
     }
 
     return nullptr;
-}
-
-WH_string HeapAnalyzer::HeapFlagsToString(WORD flags)
-{
-    WH_string res;
-    auto addFlag = [&](WORD f, const char* str)
-    {
-        if ((flags & f) == 0)
-            return;
-
-        if (res.empty() == false)
-            res += " | ";
-
-        res += str;
-    };
-
-    addFlag(PROCESS_HEAP_REGION, "Region");
-    addFlag(PROCESS_HEAP_UNCOMMITTED_RANGE, "UncommittedRange");
-    addFlag(PROCESS_HEAP_ENTRY_BUSY, "Busy");
-    addFlag(PROCESS_HEAP_SEG_ALLOC, "SegAlloc");
-    addFlag(PROCESS_HEAP_ENTRY_MOVEABLE, "Moveable");
-    addFlag(PROCESS_HEAP_ENTRY_DDESHARE, "DDEShare");
-
-    return res;
-}
-
-WH_string HeapAnalyzer::HeapEntryToString(const PROCESS_HEAP_ENTRY& heapEntry)
-{
-    static constexpr char kSeparator[] = "\n";
-    static constexpr size_t kMaxFieldName = std::max({
-        sizeof("Address"), sizeof("Size"), sizeof("Overhead"),
-        sizeof("RegIndex"), sizeof("Flags"), sizeof("hMem"),
-        sizeof("CSize"), sizeof("USize"), sizeof("FBlock"), sizeof("LBlock"),
-    }) - 1;
-
-    WH_string result;
-
-    result += NormalizeFieldName("Address", kMaxFieldName) + ToWHString(heapEntry.lpData) + kSeparator;
-    result += NormalizeFieldName("Size", kMaxFieldName) + ToWHString(heapEntry.cbData) + kSeparator;
-    result += NormalizeFieldName("Overhead", kMaxFieldName) + ToWHString(static_cast<unsigned int>(heapEntry.cbOverhead)) + kSeparator;
-    result += NormalizeFieldName("RegIndex", kMaxFieldName) + ToWHString(static_cast<unsigned int>(heapEntry.iRegionIndex)) + kSeparator;
-    result += NormalizeFieldName("Flags", kMaxFieldName) + HeapFlagsToString(heapEntry.wFlags) + kSeparator;
-
-    if ((heapEntry.wFlags & PROCESS_HEAP_ENTRY_BUSY) != 0 && (heapEntry.wFlags & PROCESS_HEAP_ENTRY_MOVEABLE) != 0)
-        result += NormalizeFieldName("hMem", kMaxFieldName) + ToWHString(heapEntry.Block.hMem) + kSeparator;
-
-    if ((heapEntry.wFlags & PROCESS_HEAP_REGION) != 0)
-    {
-        result += NormalizeFieldName("CSize", kMaxFieldName) + ToWHString(heapEntry.Region.dwCommittedSize) + kSeparator;
-        result += NormalizeFieldName("USize", kMaxFieldName) + ToWHString(heapEntry.Region.dwUnCommittedSize) + kSeparator;
-        result += NormalizeFieldName("FBlock", kMaxFieldName) + ToWHString(heapEntry.Region.lpFirstBlock) + kSeparator;
-        result += NormalizeFieldName("LBlock", kMaxFieldName) + ToWHString(heapEntry.Region.lpLastBlock) + kSeparator;
-    }
-
-    return result;
 }
 
 bool HeapAnalyzer::IsLockableHeap(HANDLE hHeap)
