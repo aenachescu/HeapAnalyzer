@@ -62,6 +62,26 @@ public:
 
     WH_string ToString(size_t identation, const char* separator) const;
 
+    inline size_t GetNumberOfBlocks() const
+    {
+        return numberOfBlocks;
+    }
+
+    inline const FieldStatistics& GetSize() const
+    {
+        return size;
+    }
+
+    inline const FieldStatistics& GetOverhead() const
+    {
+        return overhead;
+    }
+
+    inline const FieldStatistics& GetSizeWithOverhead() const
+    {
+        return sizeWithOverhead;
+    }
+
 private:
     Type type;
 

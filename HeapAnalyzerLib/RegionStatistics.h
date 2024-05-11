@@ -57,12 +57,12 @@ public:
 
     WH_string ToString(size_t identation, const char* separator) const;
 
-    void* GetStart() const
+    inline void* GetStart() const
     {
         return start;
     }
 
-    void* GetEnd() const
+    inline void* GetEnd() const
     {
         return end;
     }

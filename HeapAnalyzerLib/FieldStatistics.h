@@ -38,9 +38,29 @@ public:
         avg = Avg(total, num);
     }
 
+    inline size_t GetTotal() const
+    {
+        return total;
+    }
+
+    inline size_t GetAvg() const
+    {
+        return avg;
+    }
+
+    inline const MinValueAndCount& GetMin() const
+    {
+        return min;
+    }
+
+    inline const MaxValueAndCount& GetMax() const
+    {
+        return max;
+    }
+
 private:
     size_t total = 0;
     size_t avg = 0;
-    MinValueAndCount<> min;
-    MaxValueAndCount<> max;
+    MinValueAndCount min;
+    MaxValueAndCount max;
 };

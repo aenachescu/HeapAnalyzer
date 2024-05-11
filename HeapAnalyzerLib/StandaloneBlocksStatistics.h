@@ -42,6 +42,21 @@ public:
 
     WH_string ToString(size_t identation, const char* separator) const;
 
+    inline const BlocksStatistics& GetTotalBlocksStatistics() const
+    {
+        return total;
+    }
+
+    inline const BlocksStatistics& GetUsedBlocksStatistics() const
+    {
+        return used;
+    }
+
+    inline const BlocksStatistics& GetFreeBlocksStatistics() const
+    {
+        return free;
+    }
+
 private:
     BlocksStatistics total{ BlocksStatistics::Type::Total };
     BlocksStatistics used{ BlocksStatistics::Type::Used };

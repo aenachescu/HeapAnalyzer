@@ -65,6 +65,56 @@ public:
 
     WH_string ToString(size_t identation, const char* separator) const;
 
+    inline size_t GetNumberOfRegions() const
+    {
+        return numberOfRegions;
+    }
+
+    inline const FieldStatistics& GetSize() const
+    {
+        return size;
+    }
+
+    inline const FieldStatistics& GetOverhead() const
+    {
+        return overhead;
+    }
+
+    inline const FieldStatistics& GetSizeWithOverhead() const
+    {
+        return sizeWithOverhead;
+    }
+
+    inline const FieldStatistics& GetCommittedMemory() const
+    {
+        return committedMemory;
+    }
+
+    inline const FieldStatistics& GetUncommittedMemory() const
+    {
+        return uncommittedMemory;
+    }
+
+    inline const FieldStatistics& GetTotalMemory() const
+    {
+        return totalMemory;
+    }
+
+    inline const BlocksStatistics& GetTotalBlocksStatistics() const
+    {
+        return total;
+    }
+
+    inline const BlocksStatistics& GetUsedBlocksStatistics() const
+    {
+        return used;
+    }
+
+    inline const BlocksStatistics& GetFreeBlocksStatistics() const
+    {
+        return free;
+    }
+
 private:
     size_t numberOfRegions = 0;
 

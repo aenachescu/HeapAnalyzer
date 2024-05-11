@@ -112,10 +112,9 @@ private:
 };
 
 template<typename StorageType = size_t, typename CounterStorageType = size_t>
-using MaxValueAndCount = MaxValueT<StorageType, Counter<CounterStorageType>>;
+using MaxValueAndCountT = MaxValueT<StorageType, Counter<CounterStorageType>>;
 
-template<typename StorageType = size_t>
-using MaxValue = MaxValueT<StorageType, EmptyCounter>;
+using MaxValueAndCount = MaxValueAndCountT<>;
 
 //-----------------------------------------------------------------------------
 
@@ -198,7 +197,6 @@ private:
 };
 
 template<typename StorageType = size_t, typename CounterStorageType = size_t>
-using MinValueAndCount = MinValueT<StorageType, Counter<CounterStorageType>>;
+using MinValueAndCountT = MinValueT<StorageType, Counter<CounterStorageType>>;
 
-template<typename StorageType = size_t>
-using MinValue = MinValueT<StorageType, EmptyCounter>;
+using MinValueAndCount = MinValueAndCountT<>;

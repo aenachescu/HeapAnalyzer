@@ -36,6 +36,26 @@ public:
 
     WH_string ToString(size_t identation, const char* separator) const;
 
+    size_t GetNumberOfRanges() const
+    {
+        return numberOfRanges;
+    }
+
+    const FieldStatistics& GetSize() const
+    {
+        return size;
+    }
+
+    const FieldStatistics& GetOverhead() const
+    {
+        return overhead;
+    }
+
+    const FieldStatistics& GetSizeWithOverhead() const
+    {
+        return sizeWithOverhead;
+    }
+
 private:
     size_t numberOfRanges = 0;
 

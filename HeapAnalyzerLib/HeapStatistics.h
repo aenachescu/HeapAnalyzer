@@ -44,6 +44,36 @@ public:
 
     WH_string ToString() const;
 
+    inline void* GetHeapAddress() const
+    {
+        return heapAddress;
+    }
+
+    inline ULONG GetHeapInfo() const
+    {
+        return heapInfo;
+    }
+
+    inline const RegionsStatistics& GetRegionsStatistics() const
+    {
+        return regions;
+    }
+
+    inline const StandaloneBlocksStatistics& GetStandaloneBlocksStatistics() const
+    {
+        return standaloneBlocks;
+    }
+
+    inline const UncommittedRangesStatistics& GetUncommittedRangesStatistics() const
+    {
+        return uncommittedRanges;
+    }
+
+    inline const RegionsSummary& GetRegionsSummary() const
+    {
+        return regionsSummary;
+    }
+
 private:
     bool RegionExists(void* start, void* end) const;
     bool IsInRegion(RegionIterator region, void* addr) const;
