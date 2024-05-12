@@ -42,7 +42,7 @@ public:
         regionsSummary.Process();
     }
 
-    WH_string ToString() const;
+    WH_string ToString(bool includeRegions) const;
 
     inline void* GetHeapAddress() const
     {
