@@ -40,7 +40,16 @@ public:
         free.Process();
     }
 
-    WH_string ToString(size_t identation, const char* separator) const;
+    WH_string ToString(size_t identation, const char* separator) const
+    {
+        WH_string res;
+
+        res += total.ToString(identation, separator) + separator;
+        res += used.ToString(identation, separator) + separator;
+        res += free.ToString(identation, separator);
+
+        return res;
+    }
 
     inline const BlocksStatistics& GetTotalBlocksStatistics() const
     {
