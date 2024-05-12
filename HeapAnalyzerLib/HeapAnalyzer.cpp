@@ -67,6 +67,8 @@ HeapStatisticsPtr HeapAnalyzer::AnalyzeHeap(HANDLE hHeap)
         g_logger.LogError("failed to unlock heap {}: {}", hHeap, GetLastError());
     }
 
+    heapStats->Process();
+
     return heapStats;
 }
 
