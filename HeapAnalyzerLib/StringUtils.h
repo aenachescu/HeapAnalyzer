@@ -4,6 +4,7 @@
 #include "MinMax.h"
 
 #include <iomanip>
+#include <format>
 
 template<typename T>
 concept MinMaxConcept = requires(T a)
@@ -56,18 +57,17 @@ inline WH_string ToString(const T& val, bool addMeasurementUnit)
         v = val / static_cast<double>(kb);
     }
 
-    std::format_to(std::back_inserter(res), "{}({.2f}{})", val, v, unit);
+    std::format_to(std::back_inserter(res), "{}({:.2f}{})", val, v, unit);
 
     return res;
 }
 
 template<MinMaxConcept T>
-WH_string ToString(T& val, bool addMeasurementUnit, const char* counterText = " Count: ")
+inline WH_string ToString(const T& val, bool addMeasurementUnit)
 {
     WH_string res;
-    std::format_to(std::back_inserter(res), "{}{}{}",
+    std::format_to(std::back_inserter(res), "{} Count: {}",
         val.getCounter() > 0 ? ToString(val.getValue(), addMeasurementUnit) : "NaN",
-        counterText,
         ToString(val.getCounter()));
     return res;
 }
