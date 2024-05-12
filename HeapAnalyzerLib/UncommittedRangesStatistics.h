@@ -15,7 +15,7 @@ public:
         sizeof("Size"),
         sizeof("Overhead"),
         sizeof("SizeWithOverhead"),
-        }) - 1 + FieldStatistics::kFieldNameAlignment;
+    }) - 1 + FieldStatistics::kFieldNameAlignment;
 
 public:
     UncommittedRangesStatistics() = default;
