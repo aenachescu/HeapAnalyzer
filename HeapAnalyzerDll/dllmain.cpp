@@ -22,7 +22,7 @@ DWORD WINAPI AnalyzeHeaps(LPVOID)
 
     for (auto& s : heapsStats)
     {
-        g_logger.LogInfo("heap stats: {}", s->ToString());
+        g_logger.LogInfo("heap stats:\n{}", s->ToString(g_settings.bStatsPerRegionLogging));
     }
 
     FreeLibraryAndExitThread(g_hDll, 0);
