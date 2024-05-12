@@ -7,8 +7,21 @@
 
 #include <Windows.h>
 
+#include <algorithm>
+
 class RegionsSummary
 {
+public:
+    static constexpr size_t kFieldNameAlignment = std::max({
+        sizeof("NumberOfRegions"),
+        sizeof("Size"),
+        sizeof("Overhead"),
+        sizeof("SizeWithOverhead"),
+        sizeof("CommittedMemory"),
+        sizeof("UncommittedMemory"),
+        sizeof("TotalMemory"),
+    }) - 1 + FieldStatistics::kFieldNameAlignment;
+
 public:
     RegionsSummary() = default;
     ~RegionsSummary() = default;
