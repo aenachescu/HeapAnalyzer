@@ -2,12 +2,24 @@
 
 #include "FieldStatistics.h"
 #include "Allocator.h"
+#include "StringUtils.h"
+#include "Settings.h"
 
 #include <Windows.h>
+
+#include <format>
+#include <algorithm>
 
 class BlocksStatistics
 {
 public:
+    static constexpr size_t kFieldNameAlignment = std::max({
+        sizeof("NumberOfBlocks"),
+        sizeof("Size"),
+        sizeof("Overhead"),
+        sizeof("SizeWithOverhead"),
+    }) - 1 + FieldStatistics::kFieldNameAlignment;
+
     enum class Type
     {
         Total = 0,
@@ -60,7 +72,33 @@ public:
         sizeWithOverhead.Process(numberOfBlocks);
     }
 
-    WH_string ToString(size_t identation, const char* separator) const;
+    WH_string ToString(size_t identation, const char* separator) const
+    {
+        WH_string res;
+
+        std::format_to(std
+            ::back_inserter(res),
+            "{:{}}{} blocks statistics{}",
+            ' ', identation,
+            TypeToString(),
+            separator);
+
+        identation += Settings::kIdentationSize;
+
+        std::format_to(
+            std::back_inserter(res),
+            "{:{}}{:{}} : {}{}",
+            ' ', identation,
+            "NumberOfBlocks", kFieldNameAlignment,
+            numberOfBlocks,
+            separator);
+
+        res += size.ToString(identation, separator, "Size", kFieldNameAlignment) + separator;
+        res += overhead.ToString(identation, separator, "Overhead", kFieldNameAlignment) + separator;
+        res += sizeWithOverhead.ToString(identation, separator, "SizeWithOverhead", kFieldNameAlignment);
+
+        return res;
+    }
 
     inline size_t GetNumberOfBlocks() const
     {
@@ -83,7 +121,25 @@ public:
     }
 
 private:
-    Type type;
+    const char* TypeToString() const
+    {
+        switch (type)
+        {
+        case Type::Total:
+            return "Total";
+        case Type::Used:
+            return "Used";
+        case Type::Free:
+            return "Free";
+        default:
+            break;
+        }
+
+        return "Unknown";
+    }
+
+private:
+    const Type type;
 
     size_t numberOfBlocks = 0;
 
