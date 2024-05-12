@@ -6,9 +6,22 @@
 #include <Windows.h>
 
 #include <memory>
+#include <algorithm>
 
 class RegionStatistics
 {
+public:
+    static constexpr size_t kFieldNameAlignment = std::max({
+        sizeof("Start"),
+        sizeof("End"),
+        sizeof("Size"),
+        sizeof("Overhead"),
+        sizeof("SizeWithOverhead"),
+        sizeof("CommittedMemory"),
+        sizeof("UncommittedMemory"),
+        sizeof("TotalMemory"),
+    }) - 1;
+
 public:
     RegionStatistics(const PROCESS_HEAP_ENTRY& region)
     {

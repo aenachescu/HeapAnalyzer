@@ -191,6 +191,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="RegionsSummary.cpp" />
+    <ClCompile Include="RegionStatistics.cpp" />
     <ClCompile Include="StringUtils.cpp" />
     <ClCompile Include="UncommittedRangesStatistics.cpp" />
   </ItemGroup>

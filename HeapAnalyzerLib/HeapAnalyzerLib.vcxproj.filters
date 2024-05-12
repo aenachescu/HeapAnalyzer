@@ -80,6 +80,9 @@
     <ClCompile Include="UncommittedRangesStatistics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RegionStatistics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="RegionsSummary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
