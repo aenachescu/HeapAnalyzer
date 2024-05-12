@@ -5,8 +5,18 @@
 
 #include <Windows.h>
 
+#include <algorithm>
+
 class UncommittedRangesStatistics
 {
+public:
+    static constexpr size_t kFieldNameAlignment = std::max({
+        sizeof("NumberOfRanges"),
+        sizeof("Size"),
+        sizeof("Overhead"),
+        sizeof("SizeWithOverhead"),
+        }) - 1 + FieldStatistics::kFieldNameAlignment;
+
 public:
     UncommittedRangesStatistics() = default;
     ~UncommittedRangesStatistics() = default;
